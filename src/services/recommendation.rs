@@ -147,7 +147,7 @@ impl RecommendationService {
         Ok(RecommendationResponse {
             total_count: final_recommendations.len(),
             recommendations: final_recommendations,
-            recommendations: sorted_recommendations,
+            // recommendations: sorted_recommendations,
             processing_time_ms: processing_time,
         })
     }

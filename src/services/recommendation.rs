@@ -35,13 +35,18 @@ impl RecommendationService {
         top_k: Option<usize>,
         top_percentile: Option<f64>,
         score_threshold_percentile: Option<f64>,
+        budget_weight: f64,
+        location_weight: f64,
+        property_type_weight: f64,
+        size_weight: f64,
     ) -> Result<RecommendationResponse> {
         let start_time = std::time::Instant::now();
         
         // Check cache first
         let cache_key = format!(
-            "property_{}_{:?}_{:?}_{:?}_{:?}_{:?}", 
-            property_id, limit, min_score, top_k, top_percentile, score_threshold_percentile
+            "property_{}_{:?}_{:?}_{:?}_{:?}_{:?}_{:.3}_{:.3}_{:.3}_{:.3}", 
+            property_id, limit, min_score, top_k, top_percentile, score_threshold_percentile,
+            budget_weight, location_weight, property_type_weight, size_weight
         );
         if let Some(cached_recommendations) = self.cache.get(&cache_key).await {
             return Ok(RecommendationResponse {
@@ -60,7 +65,14 @@ impl RecommendationService {
         // Calculate recommendations in parallel
         let mut all_recommendations: Vec<Recommendation> = contacts
             .par_iter()
-            .map(|contact| self.calculate_recommendation(contact, &property))
+            .map(|contact| self.calculate_recommendation(
+                contact, 
+                &property, 
+                budget_weight, 
+                location_weight, 
+                property_type_weight, 
+                size_weight
+            ))
             .collect();
 
         // Sort by score (highest first) first for percentile calculations
@@ -98,13 +110,18 @@ impl RecommendationService {
         top_k: Option<usize>,
         top_percentile: Option<f64>,
         score_threshold_percentile: Option<f64>,
+        budget_weight: f64,
+        location_weight: f64,
+        property_type_weight: f64,
+        size_weight: f64,
     ) -> Result<RecommendationResponse> {
         let start_time = std::time::Instant::now();
         
         // Check cache first
         let cache_key = format!(
-            "contact_{}_{:?}_{:?}_{:?}_{:?}_{:?}", 
-            contact_id, limit, min_score, top_k, top_percentile, score_threshold_percentile
+            "contact_{}_{:?}_{:?}_{:?}_{:?}_{:?}_{:.3}_{:.3}_{:.3}_{:.3}", 
+            contact_id, limit, min_score, top_k, top_percentile, score_threshold_percentile,
+            budget_weight, location_weight, property_type_weight, size_weight
         );
         if let Some(cached_recommendations) = self.cache.get(&cache_key).await {
             return Ok(RecommendationResponse {
@@ -123,7 +140,14 @@ impl RecommendationService {
         // Calculate recommendations in parallel
         let mut all_recommendations: Vec<Recommendation> = properties
             .par_iter()
-            .map(|property| self.calculate_recommendation(&contact, property))
+            .map(|property| self.calculate_recommendation(
+                &contact, 
+                property, 
+                budget_weight, 
+                location_weight, 
+                property_type_weight, 
+                size_weight
+            ))
             .collect();
 
         // Sort by score (highest first) first for percentile calculations
@@ -158,6 +182,9 @@ impl RecommendationService {
     ) -> Result<BulkRecommendationResponse> {
         let start_time = std::time::Instant::now();
 
+        // Get weights from request
+        let (budget_weight, location_weight, property_type_weight, size_weight) = request.get_weights();
+
         // Get properties (either specified ones or all active)
         let properties = if let Some(property_ids) = &request.property_ids {
             let mut result = Vec::new();
@@ -179,7 +206,14 @@ impl RecommendationService {
             .map(|property| {
                 let mut all_recommendations: Vec<Recommendation> = contacts
                     .par_iter()
-                    .map(|contact| self.calculate_recommendation(contact, property))
+                    .map(|contact| self.calculate_recommendation(
+                        contact, 
+                        property, 
+                        budget_weight, 
+                        location_weight, 
+                        property_type_weight, 
+                        size_weight
+                    ))
                     .collect();
 
                 // Sort by score (highest first) first for percentile calculations
@@ -265,19 +299,31 @@ impl RecommendationService {
         recommendations
     }
 
-    fn calculate_recommendation(&self, contact: &Contact, property: &Property) -> Recommendation {
+    fn calculate_recommendation(
+        &self, 
+        contact: &Contact, 
+        property: &Property,
+        budget_weight: f64,
+        location_weight: f64,
+        property_type_weight: f64,
+        size_weight: f64,
+    ) -> Recommendation {
         // Calculate individual scores
         let budget_score = calculate_budget_score(property.price, contact.min_budget, contact.max_budget);
         let location_score = calculate_location_score(property, contact);
         let property_type_score = calculate_property_type_score(property, contact);
         let size_score = calculate_size_score(property, contact);
 
-        // Calculate overall score
+        // Calculate overall score with configurable weights
         let overall_score = calculate_overall_score(
             budget_score,
             location_score,
             property_type_score,
             size_score,
+            budget_weight,
+            location_weight,
+            property_type_weight,
+            size_weight,
         );
 
         // Calculate closest distance to preferred locations

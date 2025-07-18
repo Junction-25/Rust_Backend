@@ -90,7 +90,7 @@ if psql -lqt | cut -d \| -f 1 | grep -qw real_estate_db; then
     fi
 else
     print_status "Creating database 'real_estate_db'..."
-    createdb real_estate_db
+    # createdb real_estate_db
     print_success "Database 'real_estate_db' created"
 fi
 

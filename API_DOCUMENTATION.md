@@ -86,10 +86,16 @@ Get contact recommendations for a specific property - find potential buyers who 
 - `top_k` (query, optional): Integer - Return only the top K highest-scoring contacts
 - `top_percentile` (query, optional): Float - Return only the top X% of contacts (e.g., 0.1 for top 10%)
 - `score_threshold_percentile` (query, optional): Float - Only return contacts above the Xth percentile threshold (e.g., 0.8 for top 20%)
+- `budget_weight` (query, optional): Float - Weight for budget matching (0.0-1.0), default: 0.3
+- `location_weight` (query, optional): Float - Weight for location proximity (0.0-1.0), default: 0.25
+- `property_type_weight` (query, optional): Float - Weight for property type matching (0.0-1.0), default: 0.2
+- `size_weight` (query, optional): Float - Weight for size requirements (0.0-1.0), default: 0.25
+
+**Weight Validation**: If all four weights are provided, they must sum to exactly 1.0.
 
 **Example Request**:
 ```http
-GET /recommendations/property/456?limit=10&min_score=0.6&top_k=5&top_percentile=0.2
+GET /recommendations/property/456?limit=10&min_score=0.6&top_k=5&budget_weight=0.4&location_weight=0.3&property_type_weight=0.2&size_weight=0.1
 ```
 
 **Response**:
@@ -174,9 +180,15 @@ Get contact recommendations for multiple properties in a single request.
   "min_score": 0.6,                   // Optional: minimum score threshold
   "top_k": 3,                         // Optional: return only top K contacts per property
   "top_percentile": 0.2,              // Optional: return only top 20% of contacts per property
-  "score_threshold_percentile": 0.8   // Optional: only return contacts above 80th percentile
+  "score_threshold_percentile": 0.8,  // Optional: only return contacts above 80th percentile
+  "budget_weight": 0.4,               // Optional: weight for budget matching (default: 0.3)
+  "location_weight": 0.3,             // Optional: weight for location proximity (default: 0.25)
+  "property_type_weight": 0.2,        // Optional: weight for property type matching (default: 0.2)
+  "size_weight": 0.1                  // Optional: weight for size requirements (default: 0.25)
 }
 ```
+
+**Weight Validation**: If all four weights are provided, they must sum to exactly 1.0.
 
 **Response**:
 ```json

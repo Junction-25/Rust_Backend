@@ -109,15 +109,13 @@ pub fn calculate_overall_score(
     location_score: f64,
     property_type_score: f64,
     size_score: f64,
+    budget_weight: f64,
+    location_weight: f64,
+    property_type_weight: f64,
+    size_weight: f64,
 ) -> f64 {
-    // Weighted scoring with different importance levels
-    const BUDGET_WEIGHT: f64 = 0.3;
-    const LOCATION_WEIGHT: f64 = 0.25;
-    const PROPERTY_TYPE_WEIGHT: f64 = 0.2;
-    const SIZE_WEIGHT: f64 = 0.25;
-
-    budget_score * BUDGET_WEIGHT
-        + location_score * LOCATION_WEIGHT
-        + property_type_score * PROPERTY_TYPE_WEIGHT
-        + size_score * SIZE_WEIGHT
+    budget_score * budget_weight
+        + location_score * location_weight
+        + property_type_score * property_type_weight
+        + size_score * size_weight
 }

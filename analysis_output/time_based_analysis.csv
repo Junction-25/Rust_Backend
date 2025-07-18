@@ -1,0 +1,11 @@
+,,latency_ms,latency_ms,latency_ms,latency_ms,success
+,,mean,median,std,count,mean
+minute,endpoint,,,,,
+2025-07-18 11:54:00,bulk_recommendations,5.05,4.73,1.67,10,1.0
+2025-07-18 11:54:00,comparison,4.19,4.3,1.59,20,1.0
+2025-07-18 11:54:00,comparison_quote,6.62,5.06,3.94,5,1.0
+2025-07-18 11:54:00,health,1.59,1.4,0.64,20,1.0
+2025-07-18 11:54:00,quote_generation,4.71,4.07,1.76,6,1.0
+2025-07-18 11:54:00,recommendations,2.19,1.57,1.2,20,1.0
+2025-07-18 11:55:00,comparison_quote,4.37,4.37,,1,1.0
+2025-07-18 11:55:00,recommendation_quote,4.18,4.31,2.23,6,1.0

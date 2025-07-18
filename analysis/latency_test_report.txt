@@ -1,0 +1,33 @@
+LATENCY TEST REPORT
+==================================================
+Generated: 2025-07-18 16:52:43
+Total tests: 300
+Successful tests: 300 (100.0%)
+
+OVERALL RESPONSE TIME STATISTICS
+----------------------------------------
+Mean: 2.72 ms
+Median: 0.79 ms
+Min: 0.44 ms
+Max: 10.52 ms
+Standard Deviation: 2.99 ms
+95th Percentile: 8.26 ms
+99th Percentile: 9.62 ms
+
+SINGLE_CONTACT ENDPOINT STATISTICS
+----------------------------------------
+Tests: 200
+Mean response time: 0.69 ms
+Median response time: 0.66 ms
+Min response time: 0.44 ms
+Max response time: 1.45 ms
+95th Percentile: 0.98 ms
+
+BULK_RECOMMENDATIONS ENDPOINT STATISTICS
+----------------------------------------
+Tests: 100
+Mean response time: 6.77 ms
+Median response time: 6.70 ms
+Min response time: 3.98 ms
+Max response time: 10.52 ms
+95th Percentile: 8.98 ms

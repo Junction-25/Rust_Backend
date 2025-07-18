@@ -1,53 +1,53 @@
 SCALABILITY TEST REPORT
 ============================================================
-Generated: 2025-07-18 21:45:22
+Generated: 2025-07-18 23:17:24
 Total tests: 90
 Successful tests: 90 (100.0%)
 
 SINGLE CONTACT PERFORMANCE SUMMARY
 ----------------------------------------
-Baseline response time: 4.01 ms
-Final response time: 4.77 ms
-Performance degradation: 19.0%
+Baseline response time: 3.10 ms
+Final response time: 5.34 ms
+Performance degradation: 72.4%
 
 SINGLE CONTACT DATASET PROGRESSION
 ----------------------------------------
 Contacts   Properties   Avg Time     Recommendations
 --------------------------------------------------
-50         200          4.01         10.0           
-100        300          3.40         10.0           
-150        400          3.89         10.0           
-200        500          4.54         10.0           
-250        600          4.26         10.0           
-300        700          4.18         10.0           
-350        800          5.06         10.0           
-400        900          4.91         10.0           
-450        1000         4.76         10.0           
-500        1000         4.77         10.0           
+50         200          3.10         10.0           
+100        300          3.65         10.0           
+150        400          3.58         10.0           
+200        500          3.59         10.0           
+250        600          4.07         10.0           
+300        700          4.35         10.0           
+350        800          4.71         10.0           
+400        900          4.59         10.0           
+450        1000         5.47         10.0           
+500        1000         5.34         10.0           
 
 BULK RECOMMENDATIONS PERFORMANCE SUMMARY
 ----------------------------------------
 Bulk size 10:
-  Average response time: 5.22 ms
+  Average response time: 4.81 ms
   Average recommendations: 0.0
 Bulk size 2:
-  Average response time: 2.39 ms
+  Average response time: 2.48 ms
   Average recommendations: 0.0
 Bulk size 20:
-  Average response time: 6.48 ms
+  Average response time: 7.10 ms
   Average recommendations: 0.0
 Bulk size 5:
-  Average response time: 2.78 ms
+  Average response time: 3.03 ms
   Average recommendations: 0.0
 
 BULK EFFICIENCY ANALYSIS
 ----------------------------------------
 Bulk Size  Efficiency   Status         
 ----------------------------------------
-2          0.277        Excellent      
-5          0.128        Excellent      
-10         0.120        Excellent      
-20         0.075        Excellent      
+2          0.296        Excellent      
+5          0.144        Excellent      
+10         0.115        Excellent      
+20         0.085        Excellent      
 
 Efficiency < 0.8: Excellent bulk optimization
 Efficiency < 1.0: Good bulk optimization
@@ -56,8 +56,8 @@ Efficiency > 1.5: Poor bulk optimization - needs improvement
 SCALABILITY INSIGHTS
 ----------------------------------------
 Dataset grew by: 10.0x
-Response time grew by: 1.2x
-Scalability factor: 0.12
+Response time grew by: 1.7x
+Scalability factor: 0.17
 Assessment: Excellent scalability
 
 BULK RECOMMENDATIONS INSIGHTS

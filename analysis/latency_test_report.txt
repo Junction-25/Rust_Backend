@@ -1,33 +1,61 @@
 LATENCY TEST REPORT
 ==================================================
-Generated: 2025-07-18 22:42:32
-Total tests: 300
-Successful tests: 300 (100.0%)
+Generated: 2025-07-18 23:13:58
+Total tests: 2485
+Successful tests: 2485 (100.0%)
 
 OVERALL RESPONSE TIME STATISTICS
 ----------------------------------------
-Mean: 2.42 ms
-Median: 0.87 ms
-Min: 0.45 ms
-Max: 8.21 ms
-Standard Deviation: 2.42 ms
-95th Percentile: 6.71 ms
-99th Percentile: 7.49 ms
+Mean: 5.19 ms
+Median: 5.04 ms
+Min: 2.73 ms
+Max: 12.93 ms
+Standard Deviation: 1.06 ms
+95th Percentile: 7.10 ms
+99th Percentile: 8.60 ms
 
 SINGLE_PROPERTY ENDPOINT STATISTICS
 ----------------------------------------
-Tests: 200
-Mean response time: 0.76 ms
-Median response time: 0.68 ms
-Min response time: 0.45 ms
-Max response time: 2.41 ms
-95th Percentile: 1.23 ms
+Tests: 1988
+Mean response time: 4.90 ms
+Median response time: 4.87 ms
+Min response time: 2.73 ms
+Max response time: 10.43 ms
+95th Percentile: 6.22 ms
 
 BULK_RECOMMENDATIONS ENDPOINT STATISTICS
 ----------------------------------------
-Tests: 100
-Mean response time: 5.73 ms
-Median response time: 5.74 ms
-Min response time: 3.66 ms
-Max response time: 8.21 ms
-95th Percentile: 7.22 ms
+Tests: 497
+Mean response time: 6.37 ms
+Median response time: 6.24 ms
+Min response time: 3.46 ms
+Max response time: 12.93 ms
+95th Percentile: 8.56 ms
+
+FILTERING SCENARIO ANALYSIS
+----------------------------------------
+Basic Filtering:
+  Tests: 497
+  Mean: 5.19 ms
+  Median: 5.04 ms
+  95th Percentile: 7.07 ms
+Top K 5:
+  Tests: 497
+  Mean: 5.20 ms
+  Median: 5.07 ms
+  95th Percentile: 7.11 ms
+Top Percentile 20:
+  Tests: 497
+  Mean: 5.18 ms
+  Median: 5.03 ms
+  95th Percentile: 7.11 ms
+Combined Filtering:
+  Tests: 497
+  Mean: 5.21 ms
+  Median: 5.05 ms
+  95th Percentile: 6.95 ms
+Threshold Percentile:
+  Tests: 497
+  Mean: 5.18 ms
+  Median: 5.01 ms
+  95th Percentile: 7.08 ms

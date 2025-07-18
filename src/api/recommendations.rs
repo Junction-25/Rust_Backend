@@ -2,6 +2,29 @@ use actix_web::{web, HttpResponse, Result};
 use crate::services::recommendation::RecommendationService;
 use crate::models::*;
 
+pub async fn get_property_recommendations(
+    path: web::Path<i32>,
+    query: web::Query<RecommendationQuery>,
+    service: web::Data<RecommendationService>,
+) -> Result<HttpResponse> {
+    let property_id = path.into_inner();
+    
+    match service.get_recommendations_for_property(
+        property_id, 
+        query.limit, 
+        query.min_score,
+        query.top_k,
+        query.top_percentile,
+        query.score_threshold_percentile
+    ).await {
+        Ok(recommendations) => Ok(HttpResponse::Ok().json(recommendations)),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
+            error: "Failed to get recommendations".to_string(),
+            message: e.to_string(),
+        })),
+    }
+}
+
 pub async fn get_contact_recommendations(
     path: web::Path<i32>,
     query: web::Query<RecommendationQuery>,
@@ -9,7 +32,14 @@ pub async fn get_contact_recommendations(
 ) -> Result<HttpResponse> {
     let contact_id = path.into_inner();
     
-    match service.get_recommendations_for_contact(contact_id, query.limit, query.min_score).await {
+    match service.get_recommendations_for_contact(
+        contact_id, 
+        query.limit, 
+        query.min_score,
+        query.top_k,
+        query.top_percentile,
+        query.score_threshold_percentile
+    ).await {
         Ok(recommendations) => Ok(HttpResponse::Ok().json(recommendations)),
         Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
             error: "Failed to get recommendations".to_string(),
@@ -35,6 +65,9 @@ pub async fn get_bulk_recommendations(
 pub struct RecommendationQuery {
     pub limit: Option<usize>,
     pub min_score: Option<f64>,
+    pub top_k: Option<usize>,
+    pub top_percentile: Option<f64>, // Top X% of scores (e.g., 0.1 for top 10%)
+    pub score_threshold_percentile: Option<f64>, // Only return scores above Xth percentile
 }
 
 #[derive(serde::Serialize)]
@@ -46,6 +79,7 @@ pub struct ErrorResponse {
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/recommendations")
+            .route("/property/{property_id}", web::get().to(get_property_recommendations))
             .route("/contact/{contact_id}", web::get().to(get_contact_recommendations))
             .route("/bulk", web::post().to(get_bulk_recommendations))
     );

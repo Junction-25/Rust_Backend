@@ -51,17 +51,28 @@ pub struct RecommendationRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BulkRecommendationRequest {
-    pub limit_per_contact: Option<usize>,
+    pub limit_per_property: Option<usize>,
     pub min_score: Option<f64>,
-    pub contact_ids: Option<Vec<i32>>,
+    pub property_ids: Option<Vec<i32>>,
+    pub top_k: Option<usize>,
+    pub top_percentile: Option<f64>,
+    pub score_threshold_percentile: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BulkRecommendationResponse {
-    pub recommendations: Vec<ContactRecommendations>,
-    pub total_contacts: usize,
+    pub recommendations: Vec<PropertyRecommendations>,
+    pub total_properties: usize,
     pub total_recommendations: usize,
     pub processing_time_ms: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PropertyRecommendations {
+    pub property_id: i32,
+    pub property_address: String,
+    pub recommendations: Vec<Recommendation>,
+    pub recommendation_count: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

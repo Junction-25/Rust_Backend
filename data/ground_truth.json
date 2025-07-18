@@ -1,0 +1,801 @@
+[
+  {
+    "property": {
+      "id": "25661",
+      "location": "Bab",
+      "price": 323338,
+      "area": 113,
+      "property_type": "apartment",
+      "rooms": 2,
+      "address": "11458 Christopher Point, Bab"
+    },
+    "contacts": [
+      {
+        "id": "1",
+        "name": "Eileen Barnes",
+        "email": "jenniferlee@example.com",
+        "phone": "(669)494-3999",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 250000,
+            "max": 350000
+          },
+          "area": {
+            "min": 100,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2,
+            3
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "name": "Jonathan Munoz",
+        "email": "timothy88@example.com",
+        "phone": "583-951-Munoz",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 300000,
+            "max": 400000
+          },
+          "area": {
+            "min": 110,
+            "max": 130
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "name": "Joseph Davidson",
+        "email": "suttonrobert@example.com",
+        "phone": "001-210-998-3810x452",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 320000,
+            "max": 380000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "name": "Michael Diaz",
+        "email": "michaeldiaz@example.net",
+        "phone": "001-341-863-9538",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 300000,
+            "max": 350000
+          },
+          "area": {
+            "min": 100,
+            "max": 120
+          },
+          "property_types": [
+            "apartment",
+            "house"
+          ],
+          "rooms": [
+            2,
+            3
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "name": "Stacy Moody",
+        "email": "moody.stacy@example.org",
+        "phone": "968.835.8Moodyx626",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 280000,
+            "max": 330000
+          },
+          "area": {
+            "min": 110,
+            "max": 130
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "6",
+        "name": "Brittany Johnson",
+        "email": "johnson.brittany@example.net",
+        "phone": "+1-878-862-4381",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 300000,
+            "max": 350000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "7",
+        "name": "Jordan Tran",
+        "email": "jordan.tran@example.org",
+        "phone": "001-464-428-1786x2576",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 320000,
+            "max": 400000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "8",
+        "name": "Steven Johnson",
+        "email": "johnson.steven@example.com",
+        "phone": "Johnson-Steven",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 300000,
+            "max": 380000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "9",
+        "name": "Daniel Peters MD",
+        "email": "peters.daniel@example.net",
+        "phone": "001-322-389-7235",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 280000,
+            "max": 350000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2,
+            3
+          ]
+        }
+      },
+      {
+        "id": "10",
+        "name": "Sarah Valencia",
+        "email": "valencia.sarah@example.org",
+        "phone": "+1-397-623-7792",
+        "preferences": {
+          "locations": [
+            "Bab"
+          ],
+          "budget": {
+            "min": 300000,
+            "max": 350000
+          },
+          "area": {
+            "min": 110,
+            "max": 120
+          },
+          "property_types": [
+            "apartment"
+          ],
+          "rooms": [
+            2
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "property": {
+      "id": "22896",
+      "location": "Constantine",
+      "price": 473338,
+      "area": 145,
+      "property_type": "house",
+      "rooms": 4,
+      "address": "22822 Leblanc Squares, Constantine"
+    },
+    "contacts": [
+      {
+        "id": "11",
+        "name": "Thomas Howard",
+        "email": "howard.thomas@example.org",
+        "phone": "Howard-Thomas",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "12",
+        "name": "Barbara Jackson",
+        "email": "jackson.barbara@example.net",
+        "phone": "(707)834-4284",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 400000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4,
+            5
+          ]
+        }
+      },
+      {
+        "id": "13",
+        "name": "Ian Beck",
+        "email": "beck.ian@example.com",
+        "phone": "Beck-Ian",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 550000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "14",
+        "name": "Mark Villanueva",
+        "email": "villanueva.mark@example.com",
+        "phone": "+1-857-769-9377x939",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 420000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "15",
+        "name": "Michelle Holloway",
+        "email": "holloway.michelle@example.net",
+        "phone": "001-385-327-9150",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "16",
+        "name": "Gary Williams",
+        "email": "williams.gary@example.org",
+        "phone": "Williams-Gary",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "17",
+        "name": "Kristin King",
+        "email": "king.kristin@example.net",
+        "phone": "(562)888-8497x674",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 400000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "18",
+        "name": "Dr. Tracey Allison",
+        "email": "allison.dr.@example.org",
+        "phone": "001-831-290-6187",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 550000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house",
+            "villa"
+          ],
+          "rooms": [
+            4,
+            5
+          ]
+        }
+      },
+      {
+        "id": "19",
+        "name": "Jared Christensen",
+        "email": "christensen.jared@example.org",
+        "phone": "+1-398-382-7634",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 420000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "20",
+        "name": "Terry Ballard",
+        "email": "ballard.terry@example.org",
+        "phone": "Ballard-Terry",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "property": {
+      "id": "25697",
+      "location": "Constantine",
+      "price": 273338,
+      "area": 95,
+      "property_type": "apartment",
+      "rooms": 3,
+      "address": "280 Woods Oval Apt. 572, Constantine"
+    },
+    "contacts": [
+      {
+        "id": "11",
+        "name": "Thomas Howard",
+        "email": "howard.thomas@example.org",
+        "phone": "Howard-Thomas",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "12",
+        "name": "Barbara Jackson",
+        "email": "jackson.barbara@example.net",
+        "phone": "(707)834-4284",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 400000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4,
+            5
+          ]
+        }
+      },
+      {
+        "id": "13",
+        "name": "Ian Beck",
+        "email": "beck.ian@example.com",
+        "phone": "Beck-Ian",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 550000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "14",
+        "name": "Mark Villanueva",
+        "email": "villanueva.mark@example.com",
+        "phone": "+1-857-769-9377x939",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 420000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "15",
+        "name": "Michelle Holloway",
+        "email": "holloway.michelle@example.net",
+        "phone": "001-385-327-9150",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "16",
+        "name": "Gary Williams",
+        "email": "williams.gary@example.org",
+        "phone": "Williams-Gary",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "17",
+        "name": "Kristin King",
+        "email": "king.kristin@example.net",
+        "phone": "(562)888-8497x674",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 400000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "18",
+        "name": "Dr. Tracey Allison",
+        "email": "allison.dr.@example.org",
+        "phone": "001-831-290-6187",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 550000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house",
+            "villa"
+          ],
+          "rooms": [
+            4,
+            5
+          ]
+        }
+      },
+      {
+        "id": "19",
+        "name": "Jared Christensen",
+        "email": "christensen.jared@example.org",
+        "phone": "+1-398-382-7634",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 420000,
+            "max": 480000
+          },
+          "area": {
+            "min": 140,
+            "max": 160
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      },
+      {
+        "id": "20",
+        "name": "Terry Ballard",
+        "email": "ballard.terry@example.org",
+        "phone": "Ballard-Terry",
+        "preferences": {
+          "locations": [
+            "Constantine"
+          ],
+          "budget": {
+            "min": 450000,
+            "max": 500000
+          },
+          "area": {
+            "min": 140,
+            "max": 150
+          },
+          "property_types": [
+            "house"
+          ],
+          "rooms": [
+            4
+          ]
+        }
+      }
+    ]
+  }
+]

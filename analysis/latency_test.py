@@ -44,11 +44,12 @@ class RecommendationLatencyTester:
             return response.status_code == 200
         except requests.exceptions.RequestException:
             return False
-    
-    def test_single_contact_recommendation(self, contact_id: int, limit: Optional[int] = None, 
-                                         min_score: Optional[float] = None) -> LatencyResult:
-        """Test the single contact recommendation endpoint."""
-        url = f"{self.base_url}/recommendations/contact/{contact_id}"
+
+    def test_single_property_recommendation(self, property_id: int, limit: Optional[int] = None,
+                                             min_score: Optional[float] = None) -> LatencyResult:
+        """Test the single property recommendation endpoint."""
+        print("Testing single property recommendation for ID:", property_id)
+        url = f"{self.base_url}/recommendations/property/{property_id}"
         params = {}
         if limit is not None:
             params['limit'] = limit
@@ -71,7 +72,7 @@ class RecommendationLatencyTester:
             return LatencyResult(
                 timestamp=timestamp,
                 endpoint="single_contact",
-                contact_id=contact_id,
+                contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=response.status_code,
                 request_size_bytes=request_size,
@@ -87,7 +88,7 @@ class RecommendationLatencyTester:
             return LatencyResult(
                 timestamp=timestamp,
                 endpoint="single_contact",
-                contact_id=contact_id,
+                contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=0,
                 request_size_bytes=request_size,
@@ -101,7 +102,7 @@ class RecommendationLatencyTester:
         """Test the bulk recommendations endpoint."""
         url = f"{self.base_url}/recommendations/bulk"
         payload = {
-            "contact_ids": contact_ids
+            "property_ids": contact_ids
         }
         if limit_per_contact is not None:
             payload['limit_per_contact'] = limit_per_contact
@@ -155,13 +156,13 @@ class RecommendationLatencyTester:
                 error_message=str(e)
             )
     
-    def run_test_suite(self, iterations: int = 100, contact_ids: List[int] = None) -> None:
+    def run_test_suite(self, iterations: int = 100, property_ids: List[int] = None) -> None:
         """Run a comprehensive test suite."""
-        if contact_ids is None:
-            contact_ids = [1, 2, 3, 4, 5]  # Default contact IDs from sample data
-        
+        if property_ids is None:
+            property_ids = [2000 + i + 1 for i in range(999)]  # Default property IDs from sample data
+
         print(f"Running latency tests for {iterations} iterations...")
-        print(f"Testing contact IDs: {contact_ids}")
+        print(f"Testing property IDs: {property_ids}")
         print(f"Base URL: {self.base_url}")
         
         # Test server health first
@@ -172,21 +173,21 @@ class RecommendationLatencyTester:
         print("✓ Server health check passed")
         
         # Test single contact recommendations
-        print("\nTesting single contact recommendations...")
+        print("\nTesting single property recommendations...")
         for i in range(iterations):
-            contact_id = contact_ids[i % len(contact_ids)]
-            result = self.test_single_contact_recommendation(contact_id, limit=10)
+            property_id = property_ids[i % len(property_ids)]
+            result = self.test_single_property_recommendation(property_id, limit=10)
             self.results.append(result)
             
             if (i + 1) % 20 == 0:
-                print(f"  Completed {i + 1}/{iterations} single contact tests")
-        
+                print(f"  Completed {i + 1}/{iterations} single property tests")
+
         # Test bulk recommendations
         print("\nTesting bulk recommendations...")
         for i in range(iterations // 2):  # Half as many bulk tests since they're more expensive
             # Use different batch sizes
             batch_size = 2 + (i % 4)  # Batch sizes of 2, 3, 4, 5
-            batch_contact_ids = contact_ids[:batch_size]
+            batch_contact_ids = property_ids[:batch_size]
             result = self.test_bulk_recommendations(batch_contact_ids, limit_per_contact=5)
             self.results.append(result)
             
@@ -288,7 +289,7 @@ def main():
                        help='Base URL of the API server (default: http://localhost:8080)')
     parser.add_argument('--iterations', type=int, default=100,
                        help='Number of test iterations (default: 100)')
-    parser.add_argument('--contact-ids', nargs='+', type=int, default=[1, 2, 3, 4, 5],
+    parser.add_argument('--contact-ids', nargs='+', type=int,
                        help='Contact IDs to test (default: 1 2 3 4 5)')
     parser.add_argument('--output', default='analysis/latency_results.csv',
                        help='Output CSV file name (default: analysis/latency_results.csv)')

@@ -226,11 +226,11 @@ class RecommendationScalabilityTester:
             return response.status_code == 200
         except requests.exceptions.RequestException:
             return False
-    
-    def test_recommendation_endpoint(self, contact_id: int, total_contacts: int, 
+
+    def test_recommendation_endpoint(self, property_id: int, total_contacts: int,
                                    total_properties: int) -> ScalabilityResult:
         """Test a single recommendation request and record scalability metrics."""
-        url = f"{self.base_url}/recommendations/contact/{contact_id}"
+        url = f"{self.base_url}/recommendations/property/{property_id}"
         params = {"limit": 10}
         
         start_time = time.time()
@@ -263,7 +263,7 @@ class RecommendationScalabilityTester:
                 total_contacts=total_contacts,
                 total_properties=total_properties,
                 endpoint="single_contact",
-                contact_id=contact_id,
+                contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=response.status_code,
                 response_size_bytes=response_size,
@@ -281,7 +281,7 @@ class RecommendationScalabilityTester:
                 total_contacts=total_contacts,
                 total_properties=total_properties,
                 endpoint="single_contact",
-                contact_id=contact_id,
+                contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=0,
                 response_size_bytes=0,
@@ -300,8 +300,8 @@ class RecommendationScalabilityTester:
             contact_ids = contact_ids[:batch_size]
         
         payload = {
-            "contact_ids": contact_ids,
-            "limit_per_contact": 5  # Fewer per contact for bulk to manage response size
+            "property_ids": contact_ids,
+            "limit_per_property": 5  # Fewer per contact for bulk to manage response size
         }
         
         request_data = json.dumps(payload)
@@ -389,7 +389,7 @@ class RecommendationScalabilityTester:
         """Run the complete scalability test."""
         
         if bulk_batch_sizes is None:
-            bulk_batch_sizes = [2, 5, 10, 20]  # Different bulk sizes to test
+            bulk_batch_sizes = [2, 5, 10, 20, 50, 100]  # Different bulk sizes to test
         
         if not self.db_manager:
             print("ERROR: Database connection required for scalability testing.")
@@ -435,7 +435,7 @@ class RecommendationScalabilityTester:
         
         # Add initial properties (we want some properties available from the start)
         print("📊 Adding initial properties...")
-        self.db_manager.add_properties_batch(property_batch_size)
+        all_property_ids = self.db_manager.add_properties_batch(property_batch_size)
         current_properties = property_batch_size
         
         while current_contacts < max_contacts:
@@ -454,7 +454,8 @@ class RecommendationScalabilityTester:
             if current_properties < max_properties:
                 properties_to_add = min(property_batch_size, max_properties - current_properties)
                 if properties_to_add > 0:
-                    self.db_manager.add_properties_batch(properties_to_add)
+                    new_property_ids = self.db_manager.add_properties_batch(properties_to_add)
+                    all_property_ids.extend(new_property_ids)
                     current_properties += properties_to_add
             
             # Verify counts
@@ -464,11 +465,11 @@ class RecommendationScalabilityTester:
             # Test single contact recommendations for this dataset size
             print(f"   Testing {tests_per_step} single contact recommendations...")
             for test_num in range(tests_per_step):
-                # Pick a random contact from the recently added ones for testing
-                test_contact_id = random.choice(new_contact_ids)
-                
+                # Pick a random property from the recently added ones for testing
+                test_property_id = random.choice(new_property_ids)
+
                 result = self.test_recommendation_endpoint(
-                    test_contact_id, db_contacts, db_properties
+                    test_property_id, db_contacts, db_properties
                 )
                 self.results.append(result)
                 

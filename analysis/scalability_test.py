@@ -262,7 +262,7 @@ class RecommendationScalabilityTester:
                 timestamp=timestamp,
                 total_contacts=total_contacts,
                 total_properties=total_properties,
-                endpoint="single_contact",
+                endpoint="single_property",
                 contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=response.status_code,
@@ -280,7 +280,7 @@ class RecommendationScalabilityTester:
                 timestamp=timestamp,
                 total_contacts=total_contacts,
                 total_properties=total_properties,
-                endpoint="single_contact",
+                endpoint="single_property",
                 contact_id=property_id,
                 response_time_ms=response_time_ms,
                 status_code=0,
@@ -493,7 +493,7 @@ class RecommendationScalabilityTester:
             
             # Print step summary
             step_results = [r for r in self.results 
-                          if r.total_contacts == db_contacts and r.endpoint == "single_contact"]
+                          if r.total_contacts == db_contacts and r.endpoint == "single_property"]
             if step_results:
                 avg_response_time = sum(r.response_time_ms for r in step_results) / len(step_results)
                 success_rate = sum(1 for r in step_results if r.success) / len(step_results) * 100
@@ -569,8 +569,8 @@ class RecommendationScalabilityTester:
               f"{'Success Rate':<12} {'Avg Recommendations':<18}")
         print("-" * 80)
         
-        single_contact_groups = {k: v for k, v in size_groups.items() if k[2] == "single_contact"}
-        for (contacts, properties, endpoint), results in sorted(single_contact_groups.items()):
+        single_property_groups = {k: v for k, v in size_groups.items() if k[2] == "single_property"}
+        for (contacts, properties, endpoint), results in sorted(single_property_groups.items()):
             successful_results = [r for r in results if r.success]
             
             if successful_results:
@@ -627,7 +627,7 @@ class RecommendationScalabilityTester:
                     successful = [r for r in results if r.success]
                     if successful:
                         avg_time = sum(r.response_time_ms for r in successful) / len(successful)
-                        if endpoint == "single_contact":
+                        if endpoint == "single_property":
                             single_results.append(avg_time)
                         elif endpoint.startswith("bulk_recommendations"):
                             bulk_size = int(endpoint.split('_')[-1])

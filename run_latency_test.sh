@@ -34,9 +34,26 @@ fi
 
 echo "✅ Server is running"
 
+# Set database URL if not already set
+if [ -z "$DATABASE_URL" ]; then
+    echo "⚠️  DATABASE_URL not set. Using default..."
+    export DATABASE_URL="postgresql://username:password@localhost/real_estate_db"
+    echo "   You can set it with: export DATABASE_URL=\"your_db_url\""
+fi
+
 # Run latency tests
 echo "⏱️  Running latency tests..."
-python3 analysis/latency_test.py --iterations 200 --output latency_results.csv
+echo "🔗 Using database: $DATABASE_URL"
+
+# Auto-fetch property IDs from database (recommended)
+python3 analysis/latency_test.py --iterations 200 --db-url "$DATABASE_URL"
+
+# Alternative: Manually specify property IDs
+# python3 analysis/latency_test.py --iterations 200 --property-ids 1 2 3 4 5 --output latency_results.csv
+
+# Alternative: Use range of IDs
+# ids=$(seq 6201 6210 | tr '\n' ' ')
+# python3 analysis/latency_test.py --iterations 200 --property-ids $ids --output latency_results.csv
 
 # Generate plots
 echo "📊 Generating performance plots..."

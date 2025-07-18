@@ -40,11 +40,11 @@ def plot_response_time_vs_dataset_size(df: pd.DataFrame, output_dir: str = "."):
         return
     
     # Separate single contact and bulk results
-    single_contact_df = successful_df[successful_df['endpoint'] == 'single_contact']
+    single_property_df = successful_df[successful_df['endpoint'] == 'single_property']
     bulk_df = successful_df[successful_df['endpoint'].str.startswith('bulk_recommendations')]
     
     # Group by dataset size and calculate statistics
-    single_grouped = single_contact_df.groupby(['total_contacts', 'total_properties']).agg({
+    single_grouped = single_property_df.groupby(['total_contacts', 'total_properties']).agg({
         'response_time_ms': ['mean', 'median', 'std', 'min', 'max', 'count'],
         'recommendations_count': 'mean'
     }).reset_index()
@@ -351,15 +351,15 @@ def generate_scalability_report(df: pd.DataFrame, output_dir: str = "."):
     
     if len(successful_df) > 0:
         # Separate single contact and bulk results
-        single_contact_df = successful_df[successful_df['endpoint'] == 'single_contact']
+        single_property_df = successful_df[successful_df['endpoint'] == 'single_property']
         bulk_df = successful_df[successful_df['endpoint'].str.startswith('bulk_recommendations')]
         
         # Single contact performance summary
-        if len(single_contact_df) > 0:
+        if len(single_property_df) > 0:
             report.append("SINGLE CONTACT PERFORMANCE SUMMARY")
             report.append("-" * 40)
             
-            single_grouped = single_contact_df.groupby(['total_contacts', 'total_properties']).agg({
+            single_grouped = single_property_df.groupby(['total_contacts', 'total_properties']).agg({
                 'response_time_ms': ['mean', 'std'],
                 'recommendations_count': 'mean'
             }).reset_index()
@@ -414,7 +414,7 @@ def generate_scalability_report(df: pd.DataFrame, output_dir: str = "."):
             report.append("")
             
             # Bulk efficiency analysis
-            if len(single_contact_df) > 0:
+            if len(single_property_df) > 0:
                 report.append("BULK EFFICIENCY ANALYSIS")
                 report.append("-" * 40)
                 
@@ -422,9 +422,9 @@ def generate_scalability_report(df: pd.DataFrame, output_dir: str = "."):
                 
                 for _, bulk_row in bulk_df.iterrows():
                     # Find corresponding single contact performance
-                    matching_single = single_contact_df[
-                        (single_contact_df['total_contacts'] == bulk_row['total_contacts']) &
-                        (single_contact_df['total_properties'] == bulk_row['total_properties'])
+                    matching_single = single_property_df[
+                        (single_property_df['total_contacts'] == bulk_row['total_contacts']) &
+                        (single_property_df['total_properties'] == bulk_row['total_properties'])
                     ]
                     
                     if not matching_single.empty:
@@ -471,8 +471,8 @@ def generate_scalability_report(df: pd.DataFrame, output_dir: str = "."):
         report.append("SCALABILITY INSIGHTS")
         report.append("-" * 40)
         
-        if len(single_contact_df) > 0:
-            single_grouped = single_contact_df.groupby(['total_contacts', 'total_properties']).agg({
+        if len(single_property_df) > 0:
+            single_grouped = single_property_df.groupby(['total_contacts', 'total_properties']).agg({
                 'response_time_ms': 'mean'
             }).reset_index()
             

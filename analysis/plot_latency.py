@@ -42,7 +42,7 @@ def plot_response_time_distribution(df: pd.DataFrame, output_dir: str = "."):
     fig.suptitle('Response Time Analysis', fontsize=16, fontweight='bold')
     
     # 1. Histogram of response times by endpoint
-    axes[0, 0].hist(successful_df[successful_df['endpoint'] == 'single_contact']['response_time_ms'], 
+    axes[0, 0].hist(successful_df[successful_df['endpoint'] == 'single_property']['response_time_ms'], 
                     bins=30, alpha=0.7, label='Single Contact', color='blue')
     axes[0, 0].hist(successful_df[successful_df['endpoint'] == 'bulk_recommendations']['response_time_ms'], 
                     bins=30, alpha=0.7, label='Bulk Recommendations', color='red')
@@ -53,7 +53,7 @@ def plot_response_time_distribution(df: pd.DataFrame, output_dir: str = "."):
     axes[0, 0].grid(True, alpha=0.3)
     
     # 2. Box plot comparison
-    response_times_single = successful_df[successful_df['endpoint'] == 'single_contact']['response_time_ms']
+    response_times_single = successful_df[successful_df['endpoint'] == 'single_property']['response_time_ms']
     response_times_bulk = successful_df[successful_df['endpoint'] == 'bulk_recommendations']['response_time_ms']
     
     box_data = []
@@ -73,7 +73,7 @@ def plot_response_time_distribution(df: pd.DataFrame, output_dir: str = "."):
     
     # 3. Response time over time
     axes[1, 0].scatter(successful_df['timestamp'], successful_df['response_time_ms'], 
-                      c=successful_df['endpoint'].map({'single_contact': 'blue', 'bulk_recommendations': 'red'}),
+                      c=successful_df['endpoint'].map({'single_property': 'blue', 'bulk_recommendations': 'red'}),
                       alpha=0.6, s=20)
     axes[1, 0].set_xlabel('Time')
     axes[1, 0].set_ylabel('Response Time (ms)')
@@ -125,9 +125,10 @@ def plot_percentile_analysis(df: pd.DataFrame, output_dir: str = "."):
     x = np.arange(len(percentiles))
     width = 0.35
     
-    colors = ['blue', 'red', 'green', 'orange']
+    colors = ['blue', 'red', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow']
     for i, (endpoint, values) in enumerate(percentile_data.items()):
-        axes[0].bar(x + i * width, values, width, label=endpoint, color=colors[i], alpha=0.7)
+        # print("Color:", colors[i % len(colors)], "Endpoint:", endpoint, "Values:", values)
+        axes[0].bar(x + i * width, values, width, label=endpoint, color=colors[i % len(colors)], alpha=0.7)
     
     axes[0].set_xlabel('Percentile')
     axes[0].set_ylabel('Response Time (ms)')
@@ -137,9 +138,10 @@ def plot_percentile_analysis(df: pd.DataFrame, output_dir: str = "."):
     axes[0].legend()
     axes[0].grid(True, alpha=0.3)
     
+    print(successful_df["endpoint"].unique())
     # Response size vs response time
     axes[1].scatter(successful_df['response_size_bytes'], successful_df['response_time_ms'],
-                   c=successful_df['endpoint'].map({'single_contact': 'blue', 'bulk_recommendations': 'red'}),
+                   c=successful_df['endpoint'].map({'single_property': 'blue', 'bulk_recommendations': 'red'}),
                    alpha=0.6, s=20)
     axes[1].set_xlabel('Response Size (bytes)')
     axes[1].set_ylabel('Response Time (ms)')
@@ -173,7 +175,7 @@ def plot_load_analysis(df: pd.DataFrame, output_dir: str = "."):
     # Mean response time by window
     for endpoint in window_stats['endpoint'].unique():
         endpoint_data = window_stats[window_stats['endpoint'] == endpoint]
-        color = 'blue' if endpoint == 'single_contact' else 'red'
+        color = 'blue' if endpoint == 'single_property' else 'red'
         axes[0, 0].plot(endpoint_data['time_window'], endpoint_data['mean'], 
                        label=f'{endpoint} - Mean', color=color, marker='o')
     
@@ -186,7 +188,7 @@ def plot_load_analysis(df: pd.DataFrame, output_dir: str = "."):
     # Standard deviation over time
     for endpoint in window_stats['endpoint'].unique():
         endpoint_data = window_stats[window_stats['endpoint'] == endpoint]
-        color = 'blue' if endpoint == 'single_contact' else 'red'
+        color = 'blue' if endpoint == 'single_property' else 'red'
         axes[0, 1].plot(endpoint_data['time_window'], endpoint_data['std'], 
                        label=f'{endpoint} - Std Dev', color=color, marker='s')
     
@@ -201,7 +203,7 @@ def plot_load_analysis(df: pd.DataFrame, output_dir: str = "."):
     
     for endpoint in successful_df['endpoint'].unique():
         endpoint_data = successful_df[successful_df['endpoint'] == endpoint]
-        color = 'blue' if endpoint == 'single_contact' else 'red'
+        color = 'blue' if endpoint == 'single_property' else 'red'
         axes[1, 0].plot(endpoint_data['request_order'], endpoint_data['cumulative_avg'], 
                        label=f'{endpoint}', color=color, alpha=0.8)
     
@@ -224,7 +226,7 @@ def plot_load_analysis(df: pd.DataFrame, output_dir: str = "."):
     
     for endpoint in error_stats['endpoint'].unique():
         endpoint_data = error_stats[error_stats['endpoint'] == endpoint]
-        color = 'blue' if endpoint == 'single_contact' else 'red'
+        color = 'blue' if endpoint == 'single_property' else 'red'
         axes[1, 1].plot(endpoint_data['time_window'], endpoint_data['error_rate'], 
                        label=f'{endpoint}', color=color, marker='x')
     

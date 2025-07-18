@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: real_estate_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/real_estate_db
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      RECOMMENDATION_THRESHOLD: 0.3
+      MAX_RECOMMENDATIONS: 10
+      CACHE_TTL_SECONDS: 3600
+      CACHE_MAX_CAPACITY: 10000
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/app/migrations
+
+volumes:
+  postgres_data:

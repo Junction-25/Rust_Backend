@@ -1,86 +1,312 @@
 # Real Estate Recommendation System
 
-A high-performance Rust-based real estate recommendation system that matches properties with potential contacts using advanced scoring algorithms. The system provides REST APIs for property recommendations, comparisons, and automated quote generation.
+A high-performance Rust-based real estate recommendation system that matches properties with potential contacts using advanced scoring algorithms. The system provides REST APIs for property recommendations, comparisons, and automated quote generation with PDF reports.
 
-## Features
+## 🚀 Quick Start
+
+### Prerequisites
+- Rust 1.70+ (install via [rustup](https://rustup.rs/))
+- PostgreSQL 14+ 
+- Git
+
+### One-Command Setup
+```bash
+git clone <repository-url>
+cd real-estate-recommender
+./setup.sh
+```
+
+### Manual Setup
+```bash
+# 1. Setup environment
+cp .env.example .env
+# Edit .env if needed (default settings work for local development)
+
+# 2. Install dependencies and setup database
+cargo install sqlx-cli --no-default-features --features rustls,postgres
+sqlx migrate run
+
+# 3. Run the server
+cargo run --release
+```
+
+### Testing the System
+```bash
+# Run comprehensive tests
+./test.sh
+
+# Test API endpoints with sample data
+./examples.sh
+
+# Start the server (production mode)
+./start.sh
+```
+
+## ✨ Features
 
 ### Core Functionality
-- **Smart Recommendations**: Advanced scoring algorithm that matches contacts to properties based on budget, location preferences, property type, size requirements, and feature preferences
-- **Property Comparisons**: Detailed side-by-side property analysis with similarity metrics
-- **PDF Quote Generation**: Automated generation of professional quotes and comparison reports
-- **Bulk Processing**: Efficient bulk recommendation processing for multiple properties
-- **High Performance**: Built with Rust and Actix-web for maximum performance and concurrency
+- **🎯 Smart Recommendations**: Advanced scoring algorithm that matches contacts to properties based on:
+  - Budget compatibility (with intelligent scoring for over/under budget scenarios)
+  - Location preferences with distance calculations
+  - Property type matching (apartment, house, condo, etc.)
+  - Size requirements (rooms, area)
+  - Feature matching (required vs. preferred features)
+- **📊 Property Comparisons**: Detailed side-by-side property analysis with similarity metrics
+- **📄 PDF Generation**: Professional quotes, comparison reports, and recommendation summaries
+- **⚡ High Performance**: Built with Rust and Actix-web for maximum performance
+- **🔄 Caching**: In-memory caching with Moka for lightning-fast repeated queries
+- **🔍 Parallel Processing**: CPU-intensive calculations optimized with Rayon
 
 ### API Endpoints
 
+#### Health Check
+- `GET /health` - Service health status and version
+
 #### Recommendations
-- `GET /recommendations/property/{property_id}` - Get recommended contacts for a specific property
+- `GET /recommendations/property/{property_id}?limit={n}&min_score={score}` - Get recommended contacts for a property
 - `POST /recommendations/bulk` - Generate recommendations for multiple properties
 
-#### Comparisons
+#### Comparisons  
 - `GET /comparisons/properties?property1_id={id1}&property2_id={id2}` - Compare two properties
 
-#### Quotes & Reports
+#### PDF Reports
 - `POST /quotes/generate` - Generate a PDF quote for a property and contact
 - `POST /quotes/comparison` - Generate a PDF comparison report
 - `GET /quotes/recommendations?property_id={id}` - Generate a PDF recommendation report
 
-#### Health Check
-- `GET /health` - Service health status
-
-## Technology Stack
+## 🏗️ Technology Stack
 
 - **Backend**: Rust with Actix-web framework
-- **Database**: PostgreSQL with SQLx for async database operations
-- **Caching**: In-memory caching with Moka for high-performance recommendations
+- **Database**: PostgreSQL with SQLx for async database operations  
+- **Caching**: Moka for high-performance in-memory caching
 - **PDF Generation**: PrintPDF for professional document generation
 - **Parallel Processing**: Rayon for CPU-intensive recommendation calculations
+- **Serialization**: Serde for JSON handling
+- **UUID**: For unique identifiers
+- **Logging**: env_logger for structured logging
 
-## Architecture
+## 📁 Architecture
 
 ```
 src/
 ├── main.rs                 # Application entry point and server setup
-├── config.rs               # Configuration management
+├── config.rs               # Configuration management from environment
 ├── models/                 # Data models and structures
-│   ├── property.rs         # Property-related models
-│   ├── contact.rs          # Contact-related models
-│   └── recommendation.rs   # Recommendation models and responses
+│   ├── mod.rs              # Module declarations
+│   ├── property.rs         # Property, Location, PropertyType models
+│   ├── contact.rs          # Contact and ContactPreferences models
+│   └── recommendation.rs   # Recommendation and scoring models
 ├── services/               # Business logic layer
-│   ├── recommendation.rs   # Core recommendation engine
+│   ├── mod.rs              # Service module declarations
+│   ├── recommendation.rs   # Core recommendation engine with caching
 │   ├── comparison.rs       # Property comparison logic
-│   └── quote.rs           # Quote and PDF generation
-├── api/                    # REST API endpoints
+│   └── quote.rs            # PDF generation service
+├── db/                     # Database layer
+│   ├── mod.rs              # Database module declaration
+│   └── repository.rs       # Database access layer with SQLx
+├── api/                    # HTTP API layer
+│   ├── mod.rs              # API module declarations
 │   ├── recommendations.rs  # Recommendation endpoints
 │   ├── comparisons.rs      # Comparison endpoints
-│   └── quotes.rs          # Quote generation endpoints
-├── db/                     # Database layer
-│   └── repository.rs      # Database operations and queries
+│   └── quotes.rs           # Quote generation endpoints
 └── utils/                  # Utility functions
-    ├── scoring.rs         # Recommendation scoring algorithms
-    └── pdf.rs            # PDF generation utilities
+    ├── mod.rs              # Utility module declarations
+    ├── scoring.rs          # Scoring algorithm implementations
+    └── pdf.rs              # PDF generation utilities
 ```
 
-## Quick Start
+## 🗄️ Database Schema
 
-### Prerequisites
+### Tables
+- **properties**: Store property listings with location (JSONB), features, images
+- **contacts**: Store contact information with preferences (JSONB arrays)  
+- **Indexes**: Optimized for location queries, budget ranges, and active status
 
-- Rust 1.70+ installed
-- PostgreSQL 12+ running
-- Git
+### Key Features
+- JSONB columns for flexible location and preference storage
+- UUID primary keys for all entities
+- Automatic timestamps with triggers
+- Optimized indexes for performance
+- Sample data included for testing
 
-### Installation
+## 🧠 Recommendation Algorithm
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd real-estate-recommender
-   ```
+The system uses a sophisticated scoring algorithm that considers:
 
-2. **Set up PostgreSQL database**
-   ```bash
-   # Create database
-   createdb real_estate_db
+### 1. Budget Compatibility (Weight: 30%)
+- **Within Budget**: Perfect match
+- **Under Budget**: Scored based on utilization (60-90% is optimal)
+- **Over Budget**: Penalized based on excess amount
+
+### 2. Location Preference (Weight: 25%)
+- Distance calculation using Haversine formula
+- Preferred locations get bonus scoring
+- Proximity-based scoring for non-preferred areas
+
+### 3. Property Type Match (Weight: 20%)
+- Exact match for preferred property types
+- Boolean scoring (match/no match)
+
+### 4. Size Requirements (Weight: 15%)
+- Room count matching with tolerance
+- Area requirements with flexible bounds
+- Composite scoring for multiple criteria
+
+### 5. Feature Matching (Weight: 10%)
+- **Required Features**: Must be present (binary)
+- **Preferred Features**: Bonus scoring for matches
+- Weighted by feature importance
+
+## 🚀 Performance
+
+- **Parallel Processing**: Recommendations calculated using Rayon for multi-core utilization
+- **Caching**: Moka cache reduces database queries for repeated requests
+- **Database Optimization**: Indexed queries and optimized joins
+- **Async Operations**: Non-blocking I/O throughout the application
+
+## 📊 API Examples
+
+### Get Property Recommendations
+```bash
+curl "http://localhost:8080/recommendations/property/12345?limit=5&min_score=0.3" | jq '.'
+```
+
+### Compare Properties
+```bash
+curl "http://localhost:8080/comparisons/properties?property1_id=123&property2_id=456" | jq '.'
+```
+
+### Generate PDF Quote
+```bash
+curl -X POST "http://localhost:8080/quotes/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "property_id": "12345",
+    "contact_id": "67890",
+    "additional_costs": [
+      {"description": "Legal Fees", "amount": 150000}
+    ],
+    "custom_message": "Thank you for your interest!"
+  }' \
+  --output quote.pdf
+```
+
+## 🧪 Testing
+
+### Automated Testing
+```bash
+./test.sh  # Runs all tests including linting, building, and functionality tests
+```
+
+### Manual Testing  
+```bash
+./examples.sh  # Interactive API testing with sample data
+```
+
+### Test Coverage
+- Unit tests for scoring algorithms
+- Integration tests for API endpoints
+- Database migration testing
+- Performance benchmarks
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+# Database
+DATABASE_URL=postgresql:///real_estate_db
+
+# Server
+SERVER_HOST=127.0.0.1
+SERVER_PORT=8080
+
+# Cache
+CACHE_TTL_SECONDS=3600
+CACHE_MAX_CAPACITY=10000
+
+# Recommendations
+RECOMMENDATION_THRESHOLD=0.3
+MAX_RECOMMENDATIONS=10
+```
+
+### Default Values
+- Uses PostgreSQL peer authentication for local development
+- Includes sample data for immediate testing
+- Optimized for development and production environments
+
+## 📁 Project Scripts
+
+- **`./setup.sh`**: Complete environment setup with dependency installation
+- **`./test.sh`**: Comprehensive testing suite
+- **`./start.sh`**: Production server startup
+- **`./examples.sh`**: Interactive API demonstration with sample data
+
+## 🔍 Monitoring & Logging
+
+### Health Check
+```bash
+curl http://localhost:8080/health
+```
+
+Returns:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-07-18T09:56:03.783879516Z",
+  "version": "0.1.0"
+}
+```
+
+### Logging
+- Structured logging with env_logger
+- Request/response logging via Actix middleware
+- Configurable log levels (DEBUG, INFO, WARN, ERROR)
+
+## 🚀 Deployment
+
+### Development
+```bash
+cargo run  # Debug mode with hot reloading
+```
+
+### Production
+```bash
+cargo run --release  # Optimized build
+```
+
+### Docker (Optional)
+```dockerfile
+# Dockerfile available for containerized deployment
+# Includes multi-stage build for optimized image size
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Run tests (`./test.sh`)
+4. Commit changes (`git commit -m 'Add amazing feature'`)
+5. Push to branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- Check the [DEVELOPMENT.md](DEVELOPMENT.md) for detailed development guide
+- Review [NEXT_STEPS.md](NEXT_STEPS.md) for planned features
+- Open an issue for bugs or feature requests
+
+## 🎯 Roadmap
+
+- [ ] Machine learning-based recommendation improvements
+- [ ] Real-time notifications for new matches
+- [ ] Advanced search and filtering
+- [ ] Multi-language support
+- [ ] Mobile API optimizations
+- [ ] WebSocket support for real-time updates
    
    # Or using psql
    psql -c "CREATE DATABASE real_estate_db;"

@@ -16,7 +16,13 @@ from datetime import datetime
 
 def load_latest_results():
     """Load the most recent latency test results file."""
+    # Look in current directory and parent directory
     csv_files = glob.glob("latency_test_results_*.csv")
+    if not csv_files:
+        csv_files = glob.glob("../latency_test_results_*.csv")
+    if not csv_files:
+        csv_files = glob.glob("analysis/latency_test_results_*.csv")
+    
     if not csv_files:
         raise FileNotFoundError("No latency test results found. Run latency_test.py first.")
     
@@ -25,7 +31,7 @@ def load_latest_results():
     return pd.read_csv(latest_file)
 
 
-def analyze_results(df, output_dir="analysis_output"):
+def analyze_results(df, output_dir="results"):
     """Perform comprehensive analysis of latency results."""
     
     # Create output directory
@@ -223,7 +229,7 @@ def generate_detailed_reports(df, successful_requests, output_dir):
 def main():
     parser = argparse.ArgumentParser(description='Analyze latency test results')
     parser.add_argument('--file', help='CSV file to analyze (uses latest if not specified)')
-    parser.add_argument('--output-dir', default='analysis_output', 
+    parser.add_argument('--output-dir', default='results', 
                        help='Output directory for analysis results')
     parser.add_argument('--no-plots', action='store_true',
                        help='Skip generating plots')

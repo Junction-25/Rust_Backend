@@ -69,11 +69,12 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "🎉 Latency testing completed successfully!"
     echo ""
-    echo "📁 Check the generated CSV file for detailed results"
+    echo "📁 Check the generated CSV file in the analysis/ directory for detailed results"
     echo "📊 You can analyze the data using:"
     echo "   - Excel or Google Sheets"
-    echo "   - Python pandas: pandas.read_csv('latency_test_results_*.csv')"
-    echo "   - R: read.csv('latency_test_results_*.csv')"
+    echo "   - Python pandas: pandas.read_csv('analysis/latency_test_results_*.csv')"
+    echo "   - R: read.csv('analysis/latency_test_results_*.csv')"
+    echo "   - Or run: python3 analysis/analyze_latency.py"
 else
     echo "❌ Latency testing failed"
     exit 1

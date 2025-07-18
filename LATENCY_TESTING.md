@@ -6,13 +6,13 @@ This directory contains a comprehensive latency testing suite for the Real Estat
 
 ### Core Testing Files
 - **`latency_test.py`** - Main latency testing script
-- **`analyze_latency.py`** - Advanced results analysis and visualization
+- **`analysis/analyze_latency.py`** - Advanced results analysis and visualization
 - **`run_latency_test.sh`** - Convenient shell script to run tests
 - **`requirements.txt`** - Python dependencies
 
 ### Generated Output Files
-- **`latency_test_results_*.csv`** - Raw test results (timestamped)
-- **`analysis_output/`** - Directory containing analysis reports and charts
+- **`analysis/latency_test_results_*.csv`** - Raw test results (timestamped)
+- **`analysis/results/`** - Directory containing analysis reports and charts
 
 ## 🚀 Quick Start
 
@@ -41,10 +41,10 @@ python3 latency_test.py --iterations 15
 ### 4. Analyze Results
 ```bash
 # Analyze the latest results
-python3 analyze_latency.py
+python3 analysis/analyze_latency.py
 
 # Analyze a specific file
-python3 analyze_latency.py --file latency_test_results_20250718_143022.csv
+python3 analysis/analyze_latency.py --file analysis/latency_test_results_20250718_143022.csv
 ```
 
 ## 🔧 Detailed Usage
@@ -87,7 +87,7 @@ python3 latency_test.py --iterations 50
 python3 latency_test.py --url https://staging.example.com --iterations 25
 
 # Custom output file
-python3 latency_test.py --output my_test_results.csv
+python3 latency_test.py --output analysis/my_test_results.csv
 ```
 
 ### Results Analysis (`analyze_latency.py`)
@@ -109,11 +109,11 @@ Provides comprehensive analysis including:
 
 **Command Line Options:**
 ```bash
-python3 analyze_latency.py [OPTIONS]
+python3 analysis/analyze_latency.py [OPTIONS]
 
 Options:
   --file TEXT            Specific CSV file to analyze
-  --output-dir TEXT      Output directory (default: analysis_output)
+  --output-dir TEXT      Output directory (default: results)
   --no-plots            Skip generating visualization charts
 ```
 
@@ -188,7 +188,7 @@ python3 latency_test.py --iterations 100
 
 # Stress test with analysis
 python3 latency_test.py --iterations 200
-python3 analyze_latency.py
+python3 analysis/analyze_latency.py
 ```
 
 ### Continuous Monitoring
@@ -217,7 +217,7 @@ Use the CSV data for custom analysis:
 import pandas as pd
 
 # Load results
-df = pd.read_csv('latency_test_results_20250718_143022.csv')
+df = pd.read_csv('analysis/latency_test_results_20250718_143022.csv')
 
 # Custom analysis
 slow_requests = df[df['latency_ms'] > 1000]
@@ -281,7 +281,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: latency-results
-          path: latency_test_results_*.csv
+          path: analysis/latency_test_results_*.csv
 ```
 
 ## 📝 Best Practices

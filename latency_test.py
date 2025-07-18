@@ -338,7 +338,10 @@ class LatencyTester:
         """Save the latency test results to a CSV file."""
         if not filename:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"latency_test_results_{timestamp}.csv"
+            filename = f"analysis/latency_test_results_{timestamp}.csv"
+        
+        # Ensure analysis directory exists
+        os.makedirs("analysis", exist_ok=True)
         
         if not self.results:
             print("❌ No results to save")

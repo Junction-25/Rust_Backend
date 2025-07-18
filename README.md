@@ -1,6 +1,6 @@
 # Real Estate Recommendation System
 
-A high-performance Rust-based real estate recommendation system that matches properties with potential contacts using advanced scoring algorithms. The system provides REST APIs for property recommendations, comparisons, and automated quote generation with PDF reports.
+A high-performance Rust-based real estate recommendation system that matches properties with contacts using advanced scoring algorithms. The system provides REST APIs for property recommendations, comparisons, and automated quote generation with PDF reports.
 
 ## 🚀 Quick Start
 
@@ -45,12 +45,12 @@ cargo run --release
 ## ✨ Features
 
 ### Core Functionality
-- **🎯 Smart Recommendations**: Advanced scoring algorithm that matches contacts to properties based on:
+- **🎯 Smart Recommendations**: Advanced scoring algorithm that matches properties to contacts based on:
   - Budget compatibility (with intelligent scoring for over/under budget scenarios)
   - Location preferences with distance calculations
-  - Property type matching (apartment, house, condo, etc.)
+  - Property type matching (apartment, house, office, etc.)
   - Size requirements (rooms, area)
-  - Feature matching (required vs. preferred features)
+  - Preference matching for optimal contact-property pairing
 - **📊 Property Comparisons**: Detailed side-by-side property analysis with similarity metrics
 - **📄 PDF Generation**: Professional quotes, comparison reports, and recommendation summaries
 - **⚡ High Performance**: Built with Rust and Actix-web for maximum performance
@@ -63,8 +63,8 @@ cargo run --release
 - `GET /health` - Service health status and version
 
 #### Recommendations
-- `GET /recommendations/property/{property_id}?limit={n}&min_score={score}` - Get recommended contacts for a property
-- `POST /recommendations/bulk` - Generate recommendations for multiple properties
+- `GET /recommendations/contact/{contact_id}?limit={n}&min_score={score}` - Get recommended properties for a contact
+- `POST /recommendations/bulk` - Generate recommendations for multiple contacts
 
 #### Comparisons  
 - `GET /comparisons/properties?property1_id={id1}&property2_id={id2}` - Compare two properties
@@ -72,7 +72,6 @@ cargo run --release
 #### PDF Reports
 - `POST /quotes/generate` - Generate a PDF quote for a property and contact
 - `POST /quotes/comparison` - Generate a PDF comparison report
-- `GET /quotes/recommendations?property_id={id}` - Generate a PDF recommendation report
 
 ## 🏗️ Technology Stack
 
@@ -82,7 +81,6 @@ cargo run --release
 - **PDF Generation**: PrintPDF for professional document generation
 - **Parallel Processing**: Rayon for CPU-intensive recommendation calculations
 - **Serialization**: Serde for JSON handling
-- **UUID**: For unique identifiers
 - **Logging**: env_logger for structured logging
 
 ## 📁 Architecture
@@ -118,30 +116,55 @@ src/
 ## 🗄️ Database Schema
 
 ### Tables
-- **properties**: Store property listings with location (JSONB), features, images
-- **contacts**: Store contact information with preferences (JSONB arrays)  
-- **Indexes**: Optimized for location queries, budget ranges, and active status
+
+#### Properties
+```sql
+CREATE TABLE properties (
+    id SERIAL PRIMARY KEY,
+    address VARCHAR NOT NULL,
+    lat DOUBLE PRECISION NOT NULL,
+    lon DOUBLE PRECISION NOT NULL,
+    price DOUBLE PRECISION NOT NULL,
+    area_sqm INTEGER NOT NULL,
+    property_type VARCHAR NOT NULL,
+    number_of_rooms INTEGER NOT NULL
+);
+```
+
+#### Contacts  
+```sql
+CREATE TABLE contacts (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    preferred_locations JSONB DEFAULT '[]',
+    min_budget DOUBLE PRECISION NOT NULL,
+    max_budget DOUBLE PRECISION NOT NULL,
+    min_area_sqm INTEGER NOT NULL,
+    max_area_sqm INTEGER NOT NULL,
+    property_types JSONB DEFAULT '[]',
+    min_rooms INTEGER NOT NULL
+);
+```
 
 ### Key Features
-- JSONB columns for flexible location and preference storage
-- UUID primary keys for all entities
-- Automatic timestamps with triggers
-- Optimized indexes for performance
-- Sample data included for testing
+- **Simplified Structure**: Integer IDs and direct field storage for optimal performance
+- **JSONB columns** for flexible location preferences and property types
+- **Comprehensive Indexes**: Optimized for price, location, area, and type queries
+- **Sample Data**: Included 5 contacts and 10 properties for immediate testing
 
 ## 🧠 Recommendation Algorithm
 
-The system uses a sophisticated scoring algorithm that considers:
+The system uses a sophisticated scoring algorithm that matches properties to contacts based on:
 
-### 1. Budget Compatibility (Weight: 30%)
-- **Within Budget**: Perfect match
-- **Under Budget**: Scored based on utilization (60-90% is optimal)
+### 1. Budget Compatibility (Weight: 35%)
+- **Within Budget**: Perfect match with optimal utilization scoring
+- **Under Budget**: Scored based on budget utilization (70-90% is optimal)
 - **Over Budget**: Penalized based on excess amount
 
-### 2. Location Preference (Weight: 25%)
+### 2. Location Preference (Weight: 30%)
 - Distance calculation using Haversine formula
 - Preferred locations get bonus scoring
-- Proximity-based scoring for non-preferred areas
+- Proximity-based scoring with distance decay
 
 ### 3. Property Type Match (Weight: 20%)
 - Exact match for preferred property types
@@ -152,10 +175,10 @@ The system uses a sophisticated scoring algorithm that considers:
 - Area requirements with flexible bounds
 - Composite scoring for multiple criteria
 
-### 5. Feature Matching (Weight: 10%)
-- **Required Features**: Must be present (binary)
-- **Preferred Features**: Bonus scoring for matches
-- Weighted by feature importance
+### Score Calculation
+- Each factor contributes to an overall score (0.0 to 1.0)
+- Detailed explanations provided for each recommendation
+- Configurable minimum score thresholds
 
 ## 🚀 Performance
 
@@ -166,14 +189,25 @@ The system uses a sophisticated scoring algorithm that considers:
 
 ## 📊 API Examples
 
-### Get Property Recommendations
+### Get Contact Recommendations
 ```bash
-curl "http://localhost:8080/recommendations/property/12345?limit=5&min_score=0.3" | jq '.'
+curl "http://localhost:8080/recommendations/contact/1?limit=5&min_score=0.3" | jq '.'
+```
+
+### Bulk Recommendations for Multiple Contacts
+```bash
+curl -X POST "http://localhost:8080/recommendations/bulk" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "limit_per_contact": 3,
+    "min_score": 0.3,
+    "contact_ids": [1, 2, 3]
+  }' | jq '.'
 ```
 
 ### Compare Properties
 ```bash
-curl "http://localhost:8080/comparisons/properties?property1_id=123&property2_id=456" | jq '.'
+curl "http://localhost:8080/comparisons/properties?property1_id=1&property2_id=2" | jq '.'
 ```
 
 ### Generate PDF Quote
@@ -181,8 +215,8 @@ curl "http://localhost:8080/comparisons/properties?property1_id=123&property2_id
 curl -X POST "http://localhost:8080/quotes/generate" \
   -H "Content-Type: application/json" \
   -d '{
-    "property_id": "12345",
-    "contact_id": "67890",
+    "property_id": 1,
+    "contact_id": 1,
     "additional_costs": [
       {"description": "Legal Fees", "amount": 150000}
     ],

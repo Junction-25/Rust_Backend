@@ -87,9 +87,9 @@ models/
 
 **Key Features:**
 - Serde serialization for JSON API responses
-- UUID primary keys for all entities
-- JSONB fields for flexible data storage
-- Enum types with lowercase serialization for database compatibility
+- Integer primary keys for optimal performance
+- JSONB fields for flexible preference storage
+- Simplified schema for better maintainability
 
 #### 2. **Services** (`src/services/`)
 ```
@@ -427,7 +427,7 @@ psql real_estate_db -c "SELECT COUNT(*) FROM properties;"
 curl http://localhost:8080/health
 
 # Test specific endpoint
-curl -v "http://localhost:8080/recommendations/property/UUID?limit=1"
+curl -v "http://localhost:8080/recommendations/contact/1?limit=1"
 
 # Check server logs
 tail -f logs/server.log

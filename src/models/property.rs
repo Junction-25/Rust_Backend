@@ -1,23 +1,14 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Property {
-    pub id: Uuid,
-    pub title: String,
-    pub description: Option<String>,
-    pub property_type: PropertyType,
-    pub price: i64, // Price in cents to avoid floating point issues
+    pub id: i32,
+    pub address: String,
     pub location: Location,
+    pub price: f64,
     pub area_sqm: i32,
-    pub rooms: i32,
-    pub bathrooms: i32,
-    pub features: Vec<String>,
-    pub images: Vec<String>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub is_active: bool,
+    pub property_type: String,
+    pub number_of_rooms: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -30,31 +21,33 @@ pub enum PropertyType {
     Villa,
     Studio,
     Commercial,
+    Office,
+    Land,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Location {
-    pub address: String,
-    pub city: String,
-    pub state: String,
-    pub country: String,
-    pub postal_code: String,
-    pub latitude: f64,
-    pub longitude: f64,
+    pub lat: f64,
+    pub lon: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NamedLocation {
+    pub name: String,
+    pub lat: f64,
+    pub lon: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PropertyFilter {
-    pub property_type: Option<PropertyType>,
-    pub min_price: Option<i64>,
-    pub max_price: Option<i64>,
+    pub property_type: Option<String>,
+    pub min_price: Option<f64>,
+    pub max_price: Option<f64>,
     pub min_area: Option<i32>,
     pub max_area: Option<i32>,
     pub min_rooms: Option<i32>,
     pub max_rooms: Option<i32>,
-    pub city: Option<String>,
-    pub state: Option<String>,
-    pub features: Option<Vec<String>>,
+    pub address: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -66,11 +59,10 @@ pub struct PropertyComparison {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ComparisonMetrics {
-    pub price_difference: i64,
+    pub price_difference: f64,
     pub price_difference_percentage: f64,
     pub area_difference: i32,
     pub area_difference_percentage: f64,
     pub location_distance_km: f64,
-    pub feature_similarity_score: f64,
     pub overall_similarity_score: f64,
 }

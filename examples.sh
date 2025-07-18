@@ -56,8 +56,8 @@ echo "📋 Getting sample data from database..."
 
 # Get property IDs from database
 if [ ! -z "$DATABASE_URL" ]; then
-    PROPERTY_IDS=($(psql "$DATABASE_URL" -t -c "SELECT id FROM properties WHERE is_active = true LIMIT 3;" 2>/dev/null | tr -d ' '))
-    CONTACT_IDS=($(psql "$DATABASE_URL" -t -c "SELECT id FROM contacts WHERE is_active = true LIMIT 2;" 2>/dev/null | tr -d ' '))
+    PROPERTY_IDS=($(psql "$DATABASE_URL" -t -c "SELECT id FROM properties LIMIT 3;" 2>/dev/null | tr -d ' '))
+    CONTACT_IDS=($(psql "$DATABASE_URL" -t -c "SELECT id FROM contacts LIMIT 2;" 2>/dev/null | tr -d ' '))
     
     if [ ${#PROPERTY_IDS[@]} -gt 0 ]; then
         echo "✅ Found ${#PROPERTY_IDS[@]} sample properties"
@@ -72,12 +72,12 @@ else
 fi
 
 echo ""
-echo "🎯 Example 1: Get recommendations for a property"
+echo "🎯 Example 1: Get recommendations for a contact"
 echo "================================================"
-echo "GET $BASE_URL/recommendations/property/${PROPERTY_IDS[0]}?limit=2&min_score=0.3"
+echo "GET $BASE_URL/recommendations/contact/${CONTACT_IDS[0]}?limit=3&min_score=0.3"
 echo ""
 
-RECOMMENDATIONS=$(curl -s "$BASE_URL/recommendations/property/${PROPERTY_IDS[0]}?limit=2&min_score=0.3")
+RECOMMENDATIONS=$(curl -s "$BASE_URL/recommendations/contact/${CONTACT_IDS[0]}?limit=3&min_score=0.3")
 
 if [ $JQ_AVAILABLE -eq 0 ]; then
     echo "$RECOMMENDATIONS" | jq '.'
@@ -86,12 +86,20 @@ else
 fi
 
 echo ""
-echo "🎯 Example 2: Bulk recommendations"
-echo "=================================="
+echo "🎯 Example 2: Bulk recommendations for multiple contacts"
+echo "========================================================"
 echo "POST $BASE_URL/recommendations/bulk"
 echo ""
 
-BULK_REQUEST='{"limit_per_property": 2, "min_score": 0.2}'
+BULK_REQUEST=$(cat << EOF
+{
+    "limit_per_contact": 3,
+    "min_score": 0.3,
+    "contact_ids": [${CONTACT_IDS[0]}, ${CONTACT_IDS[1]}]
+}
+EOF
+)
+
 BULK_RESPONSE=$(curl -s -X POST "$BASE_URL/recommendations/bulk" \
     -H "Content-Type: application/json" \
     -d "$BULK_REQUEST")
@@ -215,14 +223,14 @@ echo "📊 Sample data summary:"
 echo "======================"
 echo "Properties in database:"
 if [ $JQ_AVAILABLE -eq 0 ]; then
-    psql "$DATABASE_URL" -c "SELECT id, title, property_type, price/100 as price_dollars FROM properties WHERE is_active = true;" 2>/dev/null
+    psql "$DATABASE_URL" -c "SELECT id, address, property_type, price as price_dinars FROM properties;" 2>/dev/null
 else
-    psql "$DATABASE_URL" -c "SELECT id, title, property_type FROM properties WHERE is_active = true;" 2>/dev/null
+    psql "$DATABASE_URL" -c "SELECT id, address, property_type FROM properties;" 2>/dev/null
 fi
 
 echo ""
 echo "Contacts in database:"
-psql "$DATABASE_URL" -c "SELECT id, first_name, last_name, email FROM contacts WHERE is_active = true;" 2>/dev/null
+psql "$DATABASE_URL" -c "SELECT id, name, min_budget, max_budget FROM contacts;" 2>/dev/null
 
 echo ""
 echo "🎉 All API examples completed!"
@@ -232,8 +240,8 @@ echo "=========================="
 echo "Health check:"
 echo "  curl $BASE_URL/health"
 echo ""
-echo "Get recommendations:"
-echo "  curl \"$BASE_URL/recommendations/property/${PROPERTY_IDS[0]}?limit=3&min_score=0.3\""
+echo "Get recommendations for contact:"
+echo "  curl \"$BASE_URL/recommendations/contact/${CONTACT_IDS[0]}?limit=3&min_score=0.3\""
 echo ""
 echo "Compare properties:"
 if [ ${#PROPERTY_IDS[@]} -ge 2 ]; then

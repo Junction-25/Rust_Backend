@@ -1,73 +1,48 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-use chrono::{DateTime, Utc};
-use crate::models::property::{PropertyType, Location};
+use crate::models::property::NamedLocation;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Contact {
-    pub id: Uuid,
-    pub first_name: String,
-    pub last_name: String,
-    pub email: String,
-    pub phone: Option<String>,
-    pub budget_min: i64, // In cents
-    pub budget_max: i64, // In cents
-    pub preferred_locations: Vec<Location>,
-    pub preferred_property_types: Vec<PropertyType>,
-    pub min_rooms: Option<i32>,
-    pub max_rooms: Option<i32>,
-    pub min_area: Option<i32>,
-    pub max_area: Option<i32>,
-    pub required_features: Vec<String>,
-    pub preferred_features: Vec<String>,
-    pub notes: Option<String>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub is_active: bool,
+    pub id: i32,
+    pub name: String,
+    pub preferred_locations: Vec<NamedLocation>,
+    pub min_budget: f64,
+    pub max_budget: f64,
+    pub min_area_sqm: i32,
+    pub max_area_sqm: i32,
+    pub property_types: Vec<String>,
+    pub min_rooms: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContactPreferences {
-    pub budget_min: i64,
-    pub budget_max: i64,
-    pub preferred_locations: Vec<Location>,
-    pub preferred_property_types: Vec<PropertyType>,
-    pub min_rooms: Option<i32>,
-    pub max_rooms: Option<i32>,
-    pub min_area: Option<i32>,
-    pub max_area: Option<i32>,
-    pub required_features: Vec<String>,
-    pub preferred_features: Vec<String>,
+    pub min_budget: f64,
+    pub max_budget: f64,
+    pub preferred_locations: Vec<NamedLocation>,
+    pub property_types: Vec<String>,
+    pub min_area_sqm: i32,
+    pub max_area_sqm: i32,
+    pub min_rooms: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContactFilter {
-    pub budget_min: Option<i64>,
-    pub budget_max: Option<i64>,
-    pub property_type: Option<PropertyType>,
-    pub city: Option<String>,
-    pub state: Option<String>,
+    pub min_budget: Option<f64>,
+    pub max_budget: Option<f64>,
+    pub property_type: Option<String>,
     pub min_rooms: Option<i32>,
-    pub max_rooms: Option<i32>,
+    pub min_area_sqm: Option<i32>,
+    pub max_area_sqm: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateContactRequest {
-    pub first_name: String,
-    pub last_name: String,
-    pub email: String,
-    pub phone: Option<String>,
+    pub name: String,
     pub preferences: ContactPreferences,
-    pub notes: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UpdateContactRequest {
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub email: Option<String>,
-    pub phone: Option<String>,
+    pub name: Option<String>,
     pub preferences: Option<ContactPreferences>,
-    pub notes: Option<String>,
-    pub is_active: Option<bool>,
 }

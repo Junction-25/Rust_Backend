@@ -12,8 +12,8 @@ pub struct QuoteService {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QuoteRequest {
-    pub property_id: uuid::Uuid,
-    pub contact_id: uuid::Uuid,
+    pub property_id: i32,
+    pub contact_id: i32,
     pub additional_costs: Option<Vec<AdditionalCost>>,
     pub custom_message: Option<String>,
 }
@@ -26,7 +26,7 @@ pub struct AdditionalCost {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QuoteResponse {
-    pub quote_id: uuid::Uuid,
+    pub quote_id: i32,
     pub property: Property,
     pub contact: Contact,
     pub base_price: i64,
@@ -38,9 +38,9 @@ pub struct QuoteResponse {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ComparisonQuoteRequest {
-    pub property1_id: uuid::Uuid,
-    pub property2_id: uuid::Uuid,
-    pub contact_id: uuid::Uuid,
+    pub property1_id: i32,
+    pub property2_id: i32,
+    pub contact_id: i32,
     pub custom_message: Option<String>,
 }
 
@@ -60,7 +60,7 @@ impl QuoteService {
         // Calculate total amount
         let additional_costs = request.additional_costs.unwrap_or_default();
         let additional_total: i64 = additional_costs.iter().map(|cost| cost.amount).sum();
-        let total_amount = property.price + additional_total;
+        let total_amount = property.price as i64 + additional_total;
 
         // Generate PDF
         let additional_costs_for_pdf: Vec<(String, i64)> = additional_costs
@@ -79,10 +79,10 @@ impl QuoteService {
         )?;
 
         Ok(QuoteResponse {
-            quote_id: uuid::Uuid::new_v4(),
+            quote_id: 1, // Simple ID for now
             property: property.clone(),
             contact,
-            base_price: property.price,
+            base_price: property.price as i64,
             additional_costs,
             total_amount,
             pdf_data,
@@ -113,7 +113,7 @@ impl QuoteService {
 
     pub async fn generate_recommendation_quote(
         &self,
-        property_id: uuid::Uuid,
+        property_id: i32,
         recommendations: &[Recommendation],
     ) -> Result<Vec<u8>> {
         // Get property

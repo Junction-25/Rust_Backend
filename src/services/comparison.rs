@@ -16,8 +16,8 @@ impl ComparisonService {
 
     pub async fn compare_properties(
         &self,
-        property1_id: uuid::Uuid,
-        property2_id: uuid::Uuid,
+        property1_id: i32,
+        property2_id: i32,
     ) -> Result<PropertyComparison> {
         // Get both properties
         let property1 = self.repository.get_property_by_id(property1_id).await?
@@ -39,7 +39,7 @@ impl ComparisonService {
     fn calculate_comparison_metrics(&self, property1: &Property, property2: &Property) -> ComparisonMetrics {
         // Price comparison
         let price_difference = property2.price - property1.price;
-        let price_difference_percentage = if property1.price > 0 {
+        let price_difference_percentage = if property1.price > 0.0 {
             (price_difference as f64 / property1.price as f64) * 100.0
         } else {
             0.0
@@ -54,7 +54,12 @@ impl ComparisonService {
         };
 
         // Location distance
-        let location_distance_km = calculate_distance_km(&property1.location, &property2.location);
+        let location_distance_km = calculate_distance_km(
+            property1.location.lat, 
+            property1.location.lon, 
+            property2.location.lat, 
+            property2.location.lon
+        );
 
         // Feature similarity
         let feature_similarity_score = self.calculate_feature_similarity(property1, property2);
@@ -73,32 +78,32 @@ impl ComparisonService {
             area_difference,
             area_difference_percentage,
             location_distance_km,
-            feature_similarity_score,
             overall_similarity_score,
         }
     }
 
     fn calculate_feature_similarity(&self, property1: &Property, property2: &Property) -> f64 {
-        if property1.features.is_empty() && property2.features.is_empty() {
-            return 1.0; // Both have no features, so they're similar
+        // Compare property types and number of rooms
+        let mut similarity_score = 0.0;
+        let mut factors = 0;
+
+        // Property type similarity
+        if property1.property_type == property2.property_type {
+            similarity_score += 1.0;
         }
+        factors += 1;
 
-        if property1.features.is_empty() || property2.features.is_empty() {
-            return 0.0; // One has features, the other doesn't
-        }
-
-        // Calculate Jaccard similarity (intersection over union)
-        let features1: std::collections::HashSet<_> = property1.features.iter().collect();
-        let features2: std::collections::HashSet<_> = property2.features.iter().collect();
-
-        let intersection_size = features1.intersection(&features2).count();
-        let union_size = features1.union(&features2).count();
-
-        if union_size == 0 {
-            1.0
+        // Room count similarity (normalized difference)
+        let room_diff = (property1.number_of_rooms - property2.number_of_rooms).abs();
+        let room_similarity = if room_diff <= 1 {
+            1.0 - (room_diff as f64 * 0.2) // Small penalty for 1 room difference
         } else {
-            intersection_size as f64 / union_size as f64
-        }
+            (0.0_f64).max(1.0 - (room_diff as f64 * 0.3)) // Larger penalty for bigger differences
+        };
+        similarity_score += room_similarity;
+        factors += 1;
+
+        similarity_score / factors as f64
     }
 
     fn calculate_overall_similarity(
@@ -116,7 +121,7 @@ impl ComparisonService {
         };
 
         // Price similarity (closer prices = higher similarity)
-        let price_diff_ratio = if property1.price > 0 {
+        let price_diff_ratio = if property1.price > 0.0 {
             (property1.price - property2.price).abs() as f64 / property1.price.max(property2.price) as f64
         } else {
             0.0
@@ -132,7 +137,7 @@ impl ComparisonService {
         let area_similarity = (1.0 - area_diff_ratio).max(0.0);
 
         // Room similarity
-        let room_diff = (property1.rooms - property2.rooms).abs();
+        let room_diff = (property1.number_of_rooms - property2.number_of_rooms).abs();
         let room_similarity = if room_diff == 0 {
             1.0
         } else if room_diff == 1 {

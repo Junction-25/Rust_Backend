@@ -97,10 +97,10 @@ if echo "$HEALTH_RESPONSE" | grep -q "healthy"; then
     # Test recommendation API with sample data
     echo ""
     echo "🎯 Testing recommendation API..."
-    PROPERTY_ID=$(psql "$DATABASE_URL" -t -c "SELECT id FROM properties LIMIT 1;" 2>/dev/null | xargs)
+    CONTACT_ID=$(psql "$DATABASE_URL" -t -c "SELECT id FROM contacts LIMIT 1;" 2>/dev/null | xargs)
     
-    if [ ! -z "$PROPERTY_ID" ]; then
-        RECOMMENDATIONS=$(curl -s "http://127.0.0.1:8080/recommendations/property/$PROPERTY_ID?limit=1" 2>/dev/null)
+    if [ ! -z "$CONTACT_ID" ]; then
+        RECOMMENDATIONS=$(curl -s "http://127.0.0.1:8080/recommendations/contact/$CONTACT_ID?limit=1" 2>/dev/null)
         
         if echo "$RECOMMENDATIONS" | grep -q "recommendations"; then
             echo "✅ Recommendation API working"
@@ -109,7 +109,7 @@ if echo "$HEALTH_RESPONSE" | grep -q "healthy"; then
             echo "Response: $RECOMMENDATIONS"
         fi
     else
-        echo "⚠️  No sample properties found for testing"
+        echo "⚠️  No sample contacts found for testing"
     fi
     
     # Test comparison API

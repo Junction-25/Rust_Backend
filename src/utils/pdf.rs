@@ -21,30 +21,30 @@ pub fn generate_comparison_pdf(comparison: &PropertyComparison) -> Result<Vec<u8
     current_layer.use_text("Property 1:", 14.0, Mm(20.0), Mm(y_position), &font);
     y_position -= 10.0;
     
-    current_layer.use_text(&format!("Title: {}", comparison.property1.title), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Address: {}", comparison.property1.address), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Price: ${}", comparison.property1.price / 100), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Price: ${}", comparison.property1.price / 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Area: {} sqm", comparison.property1.area_sqm), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Rooms: {}", comparison.property1.rooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Rooms: {}", comparison.property1.number_of_rooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Location: {}, {}", comparison.property1.location.city, comparison.property1.location.state), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Location: {:.4}, {:.4}", comparison.property1.location.lat, comparison.property1.location.lon), 12.0, Mm(25.0), Mm(y_position), &regular_font);
 
     // Property 2 details
     y_position -= 20.0;
     current_layer.use_text("Property 2:", 14.0, Mm(20.0), Mm(y_position), &font);
     y_position -= 10.0;
     
-    current_layer.use_text(&format!("Title: {}", comparison.property2.title), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Address: {}", comparison.property2.address), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Price: ${}", comparison.property2.price / 100), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Price: ${}", comparison.property2.price / 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Area: {} sqm", comparison.property2.area_sqm), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Rooms: {}", comparison.property2.rooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Rooms: {}", comparison.property2.number_of_rooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Location: {}, {}", comparison.property2.location.city, comparison.property2.location.state), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Location: {:.4}, {:.4}", comparison.property2.location.lat, comparison.property2.location.lon), 12.0, Mm(25.0), Mm(y_position), &regular_font);
 
     // Comparison metrics
     y_position -= 20.0;
@@ -52,7 +52,7 @@ pub fn generate_comparison_pdf(comparison: &PropertyComparison) -> Result<Vec<u8
     y_position -= 10.0;
     
     current_layer.use_text(&format!("Price Difference: ${} ({:.1}%)", 
-        comparison.comparison_metrics.price_difference / 100,
+        comparison.comparison_metrics.price_difference / 100.0,
         comparison.comparison_metrics.price_difference_percentage), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Area Difference: {} sqm ({:.1}%)", 
@@ -63,7 +63,7 @@ pub fn generate_comparison_pdf(comparison: &PropertyComparison) -> Result<Vec<u8
         comparison.comparison_metrics.location_distance_km), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Feature Similarity: {:.1}%", 
-        comparison.comparison_metrics.feature_similarity_score * 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+        comparison.comparison_metrics.overall_similarity_score * 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Overall Similarity: {:.1}%", 
         comparison.comparison_metrics.overall_similarity_score * 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
@@ -91,29 +91,21 @@ pub fn generate_quote_pdf(property: &Property, contact: &Contact, additional_cos
     let mut y_position = 240.0;
     current_layer.use_text("Client Information:", 14.0, Mm(20.0), Mm(y_position), &font);
     y_position -= 10.0;
-    current_layer.use_text(&format!("Name: {} {}", contact.first_name, contact.last_name), 12.0, Mm(25.0), Mm(y_position), &regular_font);
-    y_position -= 8.0;
-    current_layer.use_text(&format!("Email: {}", contact.email), 12.0, Mm(25.0), Mm(y_position), &regular_font);
-    if let Some(phone) = &contact.phone {
-        y_position -= 8.0;
-        current_layer.use_text(&format!("Phone: {}", phone), 12.0, Mm(25.0), Mm(y_position), &regular_font);
-    }
+    current_layer.use_text(&format!("Name: {}", contact.name), 12.0, Mm(25.0), Mm(y_position), &regular_font);
 
     // Property information
     y_position -= 20.0;
     current_layer.use_text("Property Details:", 14.0, Mm(20.0), Mm(y_position), &font);
     y_position -= 10.0;
-    current_layer.use_text(&format!("Title: {}", property.title), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Address: {}", property.address), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Address: {}", property.location.address), 12.0, Mm(25.0), Mm(y_position), &regular_font);
-    y_position -= 8.0;
-    current_layer.use_text(&format!("City: {}, {}", property.location.city, property.location.state), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Location: {:.4}, {:.4}", property.location.lat, property.location.lon), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Property Type: {:?}", property.property_type), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Area: {} sqm", property.area_sqm), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     y_position -= 8.0;
-    current_layer.use_text(&format!("Rooms: {} | Bathrooms: {}", property.rooms, property.bathrooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
+    current_layer.use_text(&format!("Rooms: {}", property.number_of_rooms), 12.0, Mm(25.0), Mm(y_position), &regular_font);
 
     // Pricing breakdown
     y_position -= 20.0;
@@ -121,13 +113,13 @@ pub fn generate_quote_pdf(property: &Property, contact: &Contact, additional_cos
     y_position -= 10.0;
     current_layer.use_text(&format!("Property Price: ${:.2}", property.price as f64 / 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
     
-    let mut total = property.price;
+    let mut total = property.price as i64;
     
     if let Some(costs) = additional_costs {
         for (description, amount) in costs {
             y_position -= 8.0;
             current_layer.use_text(&format!("{}: ${:.2}", description, *amount as f64 / 100.0), 12.0, Mm(25.0), Mm(y_position), &regular_font);
-            total += amount;
+            total += *amount;
         }
     }
 
@@ -164,10 +156,10 @@ pub fn generate_recommendation_report_pdf(recommendations: &[Recommendation], pr
 
     // Property summary
     let mut y_position = 240.0;
-    current_layer.use_text(&format!("Property: {}", property.title), 14.0, Mm(20.0), Mm(y_position), &font);
+    current_layer.use_text(&format!("Property: {}", property.address), 14.0, Mm(20.0), Mm(y_position), &font);
     y_position -= 8.0;
     current_layer.use_text(&format!("Price: ${:.2} | Area: {} sqm | Rooms: {}", 
-        property.price as f64 / 100.0, property.area_sqm, property.rooms), 11.0, Mm(20.0), Mm(y_position), &regular_font);
+        property.price as f64 / 100.0, property.area_sqm, property.number_of_rooms), 11.0, Mm(20.0), Mm(y_position), &regular_font);
 
     y_position -= 20.0;
     current_layer.use_text(&format!("Top {} Recommended Contacts:", recommendations.len()), 14.0, Mm(20.0), Mm(y_position), &font);
@@ -180,17 +172,15 @@ pub fn generate_recommendation_report_pdf(recommendations: &[Recommendation], pr
             break;
         }
 
-        current_layer.use_text(&format!("{}. {} {} (Score: {:.1}%)", 
+        current_layer.use_text(&format!("{}. {} (Score: {:.1}%)", 
             i + 1, 
-            recommendation.contact.first_name, 
-            recommendation.contact.last_name,
+            recommendation.contact.name,
             recommendation.score * 100.0), 12.0, Mm(25.0), Mm(y_position), &font);
         
         y_position -= 8.0;
-        current_layer.use_text(&format!("Email: {} | Budget: ${:.0}-${:.0}", 
-            recommendation.contact.email,
-            recommendation.contact.budget_min as f64 / 100.0,
-            recommendation.contact.budget_max as f64 / 100.0), 10.0, Mm(30.0), Mm(y_position), &regular_font);
+        current_layer.use_text(&format!("Budget: ${}-${}", 
+            recommendation.contact.min_budget,
+            recommendation.contact.max_budget), 10.0, Mm(30.0), Mm(y_position), &regular_font);
         
         y_position -= 6.0;
         if !recommendation.explanation.reasons.is_empty() {

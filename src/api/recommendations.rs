@@ -1,21 +1,16 @@
 use actix_web::{web, HttpResponse, Result};
-use crate::services::RecommendationService;
+use crate::services::recommendation::RecommendationService;
 use crate::models::*;
-use uuid::Uuid;
 
-pub async fn get_property_recommendations(
-    path: web::Path<Uuid>,
+pub async fn get_contact_recommendations(
+    path: web::Path<i32>,
     query: web::Query<RecommendationQuery>,
     service: web::Data<RecommendationService>,
 ) -> Result<HttpResponse> {
-    let property_id = path.into_inner();
+    let contact_id = path.into_inner();
     
-    match service.get_recommendations_for_property(
-        property_id,
-        query.limit,
-        query.min_score,
-    ).await {
-        Ok(response) => Ok(HttpResponse::Ok().json(response)),
+    match service.get_recommendations_for_contact(contact_id, query.limit, query.min_score).await {
+        Ok(recommendations) => Ok(HttpResponse::Ok().json(recommendations)),
         Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
             error: "Failed to get recommendations".to_string(),
             message: e.to_string(),
@@ -51,7 +46,7 @@ pub struct ErrorResponse {
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/recommendations")
-            .route("/property/{property_id}", web::get().to(get_property_recommendations))
+            .route("/contact/{contact_id}", web::get().to(get_contact_recommendations))
             .route("/bulk", web::post().to(get_bulk_recommendations))
     );
 }

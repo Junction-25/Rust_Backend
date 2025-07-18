@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
 use crate::models::{contact::Contact, property::Property};
 
@@ -19,7 +18,6 @@ pub struct RecommendationExplanation {
     pub location_match: LocationMatch,
     pub property_type_match: bool,
     pub size_match: SizeMatch,
-    pub feature_match: FeatureMatch,
     pub reasons: Vec<String>,
 }
 
@@ -41,47 +39,35 @@ pub struct LocationMatch {
 pub struct SizeMatch {
     pub rooms_match: bool,
     pub area_match: bool,
-    pub rooms_score: f64,
-    pub area_score: f64,
-    pub overall_score: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FeatureMatch {
-    pub required_features_met: bool,
-    pub preferred_features_count: i32,
-    pub total_preferred_features: i32,
     pub score: f64,
-    pub missing_required_features: Vec<String>,
-    pub matched_preferred_features: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RecommendationRequest {
-    pub property_id: Uuid,
+    pub contact_id: i32,
     pub limit: Option<usize>,
     pub min_score: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BulkRecommendationRequest {
-    pub limit_per_property: Option<usize>,
+    pub limit_per_contact: Option<usize>,
     pub min_score: Option<f64>,
-    pub property_ids: Option<Vec<Uuid>>,
+    pub contact_ids: Option<Vec<i32>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BulkRecommendationResponse {
-    pub recommendations: Vec<PropertyRecommendations>,
-    pub total_properties: usize,
+    pub recommendations: Vec<ContactRecommendations>,
+    pub total_contacts: usize,
     pub total_recommendations: usize,
     pub processing_time_ms: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PropertyRecommendations {
-    pub property_id: Uuid,
-    pub property_title: String,
+pub struct ContactRecommendations {
+    pub contact_id: i32,
+    pub contact_name: String,
     pub recommendations: Vec<Recommendation>,
     pub recommendation_count: usize,
 }

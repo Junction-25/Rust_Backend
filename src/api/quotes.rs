@@ -2,7 +2,6 @@ use actix_web::{web, HttpResponse, Result, http::header};
 use crate::services::{QuoteService, RecommendationService};
 use crate::services::quote::{QuoteRequest, ComparisonQuoteRequest};
 use crate::api::recommendations::ErrorResponse;
-use uuid::Uuid;
 use serde::Deserialize;
 
 pub async fn generate_quote(
@@ -50,48 +49,20 @@ pub async fn generate_comparison_quote(
 
 #[derive(Deserialize)]
 pub struct RecommendationQuoteQuery {
-    pub property_id: Uuid,
+    pub property_id: i32,
 }
 
 pub async fn generate_recommendation_quote(
     query: web::Query<RecommendationQuoteQuery>,
-    recommendation_service: web::Data<RecommendationService>,
-    quote_service: web::Data<QuoteService>,
+    _recommendation_service: web::Data<RecommendationService>,
+    _quote_service: web::Data<QuoteService>,
 ) -> Result<HttpResponse> {
-    // First get recommendations
-    let recommendations_result = recommendation_service.get_recommendations_for_property(
-        query.property_id,
-        Some(10), // Limit to top 10
-        Some(0.3), // Minimum score of 0.3
-    ).await;
-
-    match recommendations_result {
-        Ok(recommendations_response) => {
-            // Then generate PDF quote
-            match quote_service.generate_recommendation_quote(
-                query.property_id,
-                &recommendations_response.recommendations,
-            ).await {
-                Ok(pdf_data) => {
-                    Ok(HttpResponse::Ok()
-                        .content_type("application/pdf")
-                        .insert_header((
-                            header::CONTENT_DISPOSITION,
-                            format!("attachment; filename=\"recommendations_{}.pdf\"", query.property_id),
-                        ))
-                        .body(pdf_data))
-                },
-                Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
-                    error: "Failed to generate recommendation quote".to_string(),
-                    message: e.to_string(),
-                })),
-            }
-        },
-        Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
-            error: "Failed to get recommendations".to_string(),
-            message: e.to_string(),
-        })),
-    }
+    // TODO: Implement property-to-contact recommendations
+    // For now, return a simple response
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "message": "Recommendation quote generation not yet implemented for new schema",
+        "property_id": query.property_id
+    })))
 }
 
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {

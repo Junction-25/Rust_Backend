@@ -1,13 +1,12 @@
 use actix_web::{web, HttpResponse, Result};
 use crate::services::ComparisonService;
 use crate::api::recommendations::ErrorResponse;
-use uuid::Uuid;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct ComparisonQuery {
-    pub property1_id: Uuid,
-    pub property2_id: Uuid,
+    pub property1_id: i32,
+    pub property2_id: i32,
 }
 
 pub async fn compare_properties(

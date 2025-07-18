@@ -1,138 +1,23 @@
--- Insert sample properties
-INSERT INTO properties (id, title, description, property_type, price, location, area_sqm, rooms, bathrooms, features, images) VALUES
-(
-    gen_random_uuid(),
-    'Modern Downtown Apartment',
-    'Beautiful 2-bedroom apartment in the heart of downtown with city views',
-    'apartment',
-    350000000, -- $3,500,000 in cents
-    '{"address": "123 Main St", "city": "New York", "state": "NY", "country": "USA", "postal_code": "10001", "latitude": 40.7589, "longitude": -73.9851}',
-    95,
-    2,
-    2,
-    ARRAY['parking', 'gym', 'pool', 'doorman', 'balcony']::text[],
-    ARRAY['https://example.com/image1.jpg', 'https://example.com/image2.jpg']::text[]
-),
-(
-    gen_random_uuid(),
-    'Suburban Family House',
-    'Spacious 4-bedroom house perfect for families with large backyard',
-    'house',
-    450000000, -- $4,500,000 in cents
-    '{"address": "456 Oak Ave", "city": "Brooklyn", "state": "NY", "country": "USA", "postal_code": "11201", "latitude": 40.6892, "longitude": -73.9442}',
-    180,
-    4,
-    3,
-    ARRAY['garage', 'garden', 'fireplace', 'basement']::text[],
-    ARRAY['https://example.com/house1.jpg', 'https://example.com/house2.jpg']::text[]
-),
-(
-    gen_random_uuid(),
-    'Luxury Penthouse',
-    'Exclusive penthouse with panoramic views and premium amenities',
-    'apartment',
-    800000000, -- $8,000,000 in cents
-    '{"address": "789 Park Ave", "city": "New York", "state": "NY", "country": "USA", "postal_code": "10021", "latitude": 40.7736, "longitude": -73.9566}',
-    250,
-    3,
-    3,
-    ARRAY['concierge', 'rooftop', 'gym', 'pool', 'spa', 'parking']::text[],
-    ARRAY['https://example.com/penthouse1.jpg']::text[]
-),
-(
-    gen_random_uuid(),
-    'Cozy Studio in Williamsburg',
-    'Charming studio apartment in trendy Williamsburg neighborhood',
-    'studio',
-    280000000, -- $2,800,000 in cents
-    '{"address": "321 Berry St", "city": "Brooklyn", "state": "NY", "country": "USA", "postal_code": "11249", "latitude": 40.7208, "longitude": -73.9538}',
-    45,
-    1,
-    1,
-    ARRAY['laundry', 'bike_storage', 'rooftop']::text[],
-    ARRAY['https://example.com/studio1.jpg']::text[]
-);
+-- Sample data for the simplified schema
+-- This migration adds sample data to work with the new simplified schema
 
--- Insert sample contacts
-INSERT INTO contacts (id, first_name, last_name, email, phone, budget_min, budget_max, preferred_locations, preferred_property_types, min_rooms, max_rooms, min_area, max_area, required_features, preferred_features, notes) VALUES
-(
-    gen_random_uuid(),
-    'John',
-    'Smith',
-    'john.smith@email.com',
-    '+1-555-0101',
-    300000000, -- $3,000,000 in cents
-    500000000, -- $5,000,000 in cents
-    '[
-        {"address": "", "city": "New York", "state": "NY", "country": "USA", "postal_code": "", "latitude": 40.7589, "longitude": -73.9851},
-        {"address": "", "city": "Brooklyn", "state": "NY", "country": "USA", "postal_code": "", "latitude": 40.6892, "longitude": -73.9442}
-    ]',
-    '["apartment", "condo"]',
-    2,
-    3,
-    80,
-    150,
-    ARRAY['parking']::text[],
-    ARRAY['gym', 'doorman', 'balcony']::text[],
-    'Looking for a modern apartment with good amenities'
-),
-(
-    gen_random_uuid(),
-    'Sarah',
-    'Johnson',
-    'sarah.johnson@email.com',
-    '+1-555-0102',
-    400000000, -- $4,000,000 in cents
-    600000000, -- $6,000,000 in cents
-    '[
-        {"address": "", "city": "Brooklyn", "state": "NY", "country": "USA", "postal_code": "", "latitude": 40.6892, "longitude": -73.9442}
-    ]',
-    '["house", "townhouse"]',
-    3,
-    5,
-    150,
-    250,
-    ARRAY['garage', 'garden']::text[],
-    ARRAY['fireplace', 'basement']::text[],
-    'Family looking for a house with outdoor space'
-),
-(
-    gen_random_uuid(),
-    'Michael',
-    'Chen',
-    'michael.chen@email.com',
-    '+1-555-0103',
-    250000000, -- $2,500,000 in cents
-    350000000, -- $3,500,000 in cents
-    '[
-        {"address": "", "city": "Brooklyn", "state": "NY", "country": "USA", "postal_code": "", "latitude": 40.7208, "longitude": -73.9538}
-    ]',
-    '["studio", "apartment"]',
-    1,
-    2,
-    40,
-    100,
-    ARRAY[]::text[],
-    ARRAY['laundry', 'bike_storage', 'rooftop']::text[],
-    'Young professional looking for trendy neighborhood'
-),
-(
-    gen_random_uuid(),
-    'Emily',
-    'Rodriguez',
-    'emily.rodriguez@email.com',
-    '+1-555-0104',
-    700000000, -- $7,000,000 in cents
-    1000000000, -- $10,000,000 in cents
-    '[
-        {"address": "", "city": "New York", "state": "NY", "country": "USA", "postal_code": "", "latitude": 40.7736, "longitude": -73.9566}
-    ]',
-    '["apartment", "condo"]',
-    2,
-    4,
-    200,
-    400,
-    ARRAY['concierge', 'parking']::text[],
-    ARRAY['gym', 'pool', 'spa', 'rooftop']::text[],
-    'Looking for luxury living with premium amenities'
-);
+-- Insert sample contacts with simplified structure
+INSERT INTO contacts (name, preferred_locations, min_budget, max_budget, min_area_sqm, max_area_sqm, property_types, min_rooms) VALUES
+('Eileen Barnes', '[{"name": "Around Bab", "lat": 36.73435, "lon": 3.20663}]', 15250000.0, 22280000.0, 65, 100, '["office"]', 0),
+('Jonathan Munoz', '[{"name": "Alger Centre", "lat": 36.7631, "lon": 3.0573}]', 16000000.0, 25000000.0, 80, 120, '["apartment", "house"]', 2),
+('Michelle Williams', '[{"name": "Constantine", "lat": 36.365, "lon": 6.6147}]', 20000000.0, 35000000.0, 100, 200, '["house", "villa"]', 3),
+('Robert Johnson', '[{"name": "Oran", "lat": 35.6969, "lon": -0.6331}]', 18000000.0, 28000000.0, 90, 150, '["apartment", "office"]', 1),
+('Sarah Davis', '[{"name": "Around Alger", "lat": 36.7538, "lon": 3.0588}]', 12000000.0, 20000000.0, 60, 90, '["apartment", "studio"]', 1);
+
+-- Insert sample properties with simplified structure
+INSERT INTO properties (address, lat, lon, price, area_sqm, property_type, number_of_rooms) VALUES
+('11458 Christopher Point, Bab', 36.7243, 3.21647, 15540000.0, 137, 'apartment', 3),
+('22822 Leblanc Squares, Constantine', 36.37705, 6.59604, 24980000.0, 386, 'land', 0),
+('280 Woods Oval Apt. 572, Constantine', 36.37352, 6.61371, 30810000.0, 906, 'land', 0),
+('45 Rue de la République, Alger', 36.7538, 3.0588, 18500000.0, 95, 'apartment', 2),
+('123 Boulevard Mohamed V, Oran', 35.6969, -0.6331, 22000000.0, 120, 'house', 4),
+('78 Avenue Pasteur, Constantine', 36.365, 6.6147, 16800000.0, 85, 'apartment', 2),
+('156 Rue Didouche Mourad, Alger', 36.7631, 3.0573, 35000000.0, 150, 'office', 0),
+('234 Avenue de l''Indépendance, Oran', 35.7022, -0.6412, 19500000.0, 110, 'apartment', 3),
+('67 Rue Ben Badis, Bab El Oued', 36.7832, 3.0456, 14200000.0, 75, 'apartment', 1),
+('189 Boulevard Zighoud Youcef, Constantine', 36.3711, 6.6042, 28500000.0, 200, 'house', 5);

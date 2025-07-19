@@ -280,9 +280,9 @@ my-recommender/
 │   └── unit_tests.rs             # Unit tests
 ├── docs/                         # Documentation
 │   ├── ARCHITECTURE.md           # Complete architecture guide
-│   ├── API_REFERENCE.md          # Detailed API documentation
 │   ├── ML_ENGINES.md             # AI/ML engine documentation
 │   └── DEPLOYMENT.md             # Production deployment guide
+├── API_DOCUMENTATION_V3.md      # Complete API documentation
 ├── test-comprehensive.sh         # Automated comprehensive test suite
 ├── SYSTEM_SUMMARY.md            # Complete system overview
 ├── Cargo.toml                   # Rust dependencies and metadata
@@ -678,7 +678,7 @@ RUST_LOG=my_recommender::services::ai=debug cargo run
 ### **Complete Documentation Suite**
 - **📖 [ARCHITECTURE.md](./ARCHITECTURE.md)**: Complete system architecture guide (522 lines)
 - **📋 [SYSTEM_SUMMARY.md](./SYSTEM_SUMMARY.md)**: Comprehensive system overview and achievements
-- **🔍 [API_REFERENCE.md](./API_REFERENCE.md)**: Complete API documentation with examples
+- **🔍 [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md)**: Complete API documentation with examples
 - **🧠 [ML_ENGINES.md](./docs/ML_ENGINES.md)**: AI/ML engine specifications and algorithms
 - **🚀 [DEPLOYMENT.md](./docs/DEPLOYMENT.md)**: Production deployment guide with Docker/K8s
 - **🧪 [test-comprehensive.sh](./test-comprehensive.sh)**: Automated testing suite (56 tests)
@@ -811,7 +811,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - Check the [DEVELOPMENT.md](DEVELOPMENT.md) for detailed development guide
-- Review [NEXT_STEPS.md](NEXT_STEPS.md) for planned features
+- Review the [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) for complete documentation navigation
 - Open an issue for bugs or feature requests
 
 ## 🎯 Roadmap

@@ -13,7 +13,7 @@ Welcome to the MY-RECOMMENDER documentation suite. This index helps you find the
 2. **[test-comprehensive.sh](./test-comprehensive.sh)** - Run this to test the complete system
 
 ### **API Usage**  
-3. **[API_REFERENCE.md](./API_REFERENCE.md)** - Complete API documentation with examples
+3. **[API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md)** - Complete API documentation with examples
 
 ---
 
@@ -49,12 +49,12 @@ Welcome to the MY-RECOMMENDER documentation suite. This index helps you find the
 |----------|-------|---------|
 | **README.md** | 1,123 | Main documentation and overview |
 | **docs/DEPLOYMENT.md** | 711 | Production deployment guide |
-| **API_REFERENCE.md** | 657 | Complete API documentation |
+| **API_DOCUMENTATION_V3.md** | 393 | Complete API documentation |
 | **docs/ML_ENGINES.md** | 626 | AI/ML engine specifications |
 | **ARCHITECTURE.md** | 521 | System architecture guide |
 | **SYSTEM_SUMMARY.md** | 286 | Executive summary |
 
-**Total Documentation**: **3,924+ lines** of comprehensive technical documentation
+**Total Documentation**: **3,660+ lines** of comprehensive technical documentation
 
 ---
 
@@ -63,7 +63,7 @@ Welcome to the MY-RECOMMENDER documentation suite. This index helps you find the
 ### **👨‍💻 Developers**
 - **[README.md](./README.md)** - Getting started
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture  
-- **[API_REFERENCE.md](./API_REFERENCE.md)** - API integration
+- **[API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md)** - API integration
 - **[docs/ML_ENGINES.md](./docs/ML_ENGINES.md)** - AI/ML implementation
 
 ### **🚀 DevOps/SysAdmin**
@@ -87,21 +87,21 @@ Welcome to the MY-RECOMMENDER documentation suite. This index helps you find the
 
 ### **🎯 Recommendations**
 - **Algorithm details**: [ARCHITECTURE.md](./ARCHITECTURE.md) - Services section
-- **API endpoints**: [API_REFERENCE.md](./API_REFERENCE.md) - Traditional Recommendations
+- **API endpoints**: [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md) - Traditional Recommendations
 - **ML enhancement**: [docs/ML_ENGINES.md](./docs/ML_ENGINES.md) - Collaborative Filtering
 
 ### **🧠 AI/ML Features** 
 - **Engine overview**: [docs/ML_ENGINES.md](./docs/ML_ENGINES.md)
-- **API usage**: [API_REFERENCE.md](./API_REFERENCE.md) - AI/ML Recommendations  
+- **API usage**: [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md) - AI/ML Recommendations  
 - **Model training**: [docs/ML_ENGINES.md](./docs/ML_ENGINES.md) - Training sections
 
 ### **⚡ Real-time Features**
-- **WebSocket API**: [API_REFERENCE.md](./API_REFERENCE.md) - WebSocket API
+- **WebSocket API**: [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md) - WebSocket API
 - **Architecture**: [ARCHITECTURE.md](./ARCHITECTURE.md) - RealtimeNotificationService
 - **Deployment**: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) - Real-time configuration
 
 ### **📄 PDF Generation**
-- **API endpoints**: [API_REFERENCE.md](./API_REFERENCE.md) - PDF Generation API
+- **API endpoints**: [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md) - PDF Generation API
 - **Service details**: [ARCHITECTURE.md](./ARCHITECTURE.md) - QuoteService
 - **Examples**: [README.md](./README.md) - PDF Generation examples
 
@@ -135,13 +135,13 @@ curl http://localhost:8080/health
 
 ### **Common Tasks**
 - **🚀 Start the system**: See [README.md](./README.md) - Quick Start
-- **📡 Use the API**: See [API_REFERENCE.md](./API_REFERENCE.md)  
+- **📡 Use the API**: See [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md)  
 - **🔧 Deploy to production**: See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 - **🧠 Understand AI features**: See [docs/ML_ENGINES.md](./docs/ML_ENGINES.md)
 
 ### **Troubleshooting**
 - **System issues**: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) - Troubleshooting section
-- **API errors**: [API_REFERENCE.md](./API_REFERENCE.md) - Error Handling  
+- **API errors**: [API_DOCUMENTATION_V3.md](./API_DOCUMENTATION_V3.md) - Error Handling  
 - **Performance problems**: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) - Performance section
 
 ---

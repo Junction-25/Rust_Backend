@@ -4,9 +4,11 @@ mod db;
 mod services;
 mod api;
 mod utils;
+mod ml;
 
 use actix_web::{web, App, HttpServer, middleware::Logger};
 use actix_cors::Cors;
+use actix::Actor;
 use sqlx::PgPool;
 use std::sync::Arc;
 use std::time::Duration;
@@ -42,11 +44,27 @@ async fn main() -> std::io::Result<()> {
     
     let comparison_service = services::ComparisonService::new(repository.clone());
     let quote_service = services::QuoteService::new(repository.clone());
+    
+    // Initialize AI recommendation service
+    let ai_service = services::AIRecommendationService::new(
+        repository.clone(),
+        Arc::new(recommendation_service.clone()),
+    );
+
+    // Initialize WebSocket manager
+    let ws_manager = services::realtime::WebSocketManager::default().start();
+    
+    // Initialize real-time notification service
+    let notification_service = services::realtime::RealtimeNotificationService::new(ws_manager.clone());
+    
+    // Start background notifications
+    notification_service.start_background_notifications();
 
     let server_host = config.server.host.clone();
     let server_port = config.server.port;
 
     log::info!("Starting server at http://{}:{}", server_host, server_port);
+    log::info!("WebSocket endpoint available at ws://{}:{}/ws", server_host, server_port);
 
     // Start HTTP server
     HttpServer::new(move || {
@@ -60,9 +78,13 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(recommendation_service.clone()))
             .app_data(web::Data::new(comparison_service.clone()))
             .app_data(web::Data::new(quote_service.clone()))
+            .app_data(web::Data::new(ai_service.clone()))
+            .app_data(web::Data::new(ws_manager.clone()))
+            .app_data(web::Data::new(notification_service.clone()))
             .wrap(cors)
             .wrap(Logger::default())
             .configure(api::configure_routes)
+            .configure(services::realtime::configure_websocket_routes)
             .route("/health", web::get().to(health_check))
     })
     .bind(format!("{}:{}", server_host, server_port))?

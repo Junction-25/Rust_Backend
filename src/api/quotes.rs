@@ -54,15 +54,44 @@ pub struct RecommendationQuoteQuery {
 
 pub async fn generate_recommendation_quote(
     query: web::Query<RecommendationQuoteQuery>,
-    _recommendation_service: web::Data<RecommendationService>,
-    _quote_service: web::Data<QuoteService>,
+    recommendation_service: web::Data<RecommendationService>,
+    quote_service: web::Data<QuoteService>,
 ) -> Result<HttpResponse> {
-    // TODO: Implement property-to-contact recommendations
-    // For now, return a simple response
-    Ok(HttpResponse::Ok().json(serde_json::json!({
-        "message": "Recommendation quote generation not yet implemented for new schema",
-        "property_id": query.property_id
-    })))
+    // Get recommendations for the property
+    match recommendation_service.get_recommendations_for_property(
+        query.property_id, 
+        Some(5), // Top 5 recommendations
+        None,
+        None,
+        None,
+        None
+    ).await {
+        Ok(recommendations) => {
+            // Generate PDF with the recommendations
+            match quote_service.generate_recommendation_quote(
+                query.property_id,
+                &recommendations.recommendations
+            ).await {
+                Ok(pdf_data) => {
+                    Ok(HttpResponse::Ok()
+                        .content_type("application/pdf")
+                        .insert_header((
+                            header::CONTENT_DISPOSITION,
+                            format!("attachment; filename=\"recommendations_{}.pdf\"", query.property_id),
+                        ))
+                        .body(pdf_data))
+                },
+                Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
+                    error: "Failed to generate recommendation PDF".to_string(),
+                    message: e.to_string(),
+                })),
+            }
+        },
+        Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
+            error: "Failed to get recommendations".to_string(),
+            message: e.to_string(),
+        })),
+    }
 }
 
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {

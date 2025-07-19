@@ -16,4 +16,7 @@ pub struct ErrorResponse {
 pub struct RecommendationQuery {
     pub limit: Option<usize>,
     pub min_score: Option<f64>,
+    pub top_k: Option<usize>,
+    pub top_percentile: Option<f64>,
+    pub score_threshold_percentile: Option<f64>,
 }

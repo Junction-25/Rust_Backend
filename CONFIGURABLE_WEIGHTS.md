@@ -23,13 +23,6 @@ All endpoints now accept the following optional weight parameters:
 | `property_type_weight` | float | Weight for property type matching (0.0-1.0) | 0.2 |
 | `size_weight` | float | Weight for size requirements (0.0-1.0) | 0.25 |
 
-## Validation Rules
-
-1. **Sum Constraint**: If all four weights are provided, they **must sum to exactly 1.0**
-2. **Non-negative**: All weights must be non-negative (≥ 0.0)
-3. **Partial Weights**: You can provide partial weights - missing weights will use default values
-4. **Tolerance**: Sum validation uses a tolerance of 0.001 for floating-point precision
-
 ## API Examples
 
 ### Property Recommendations with Custom Weights

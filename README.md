@@ -13,7 +13,8 @@ A high-performance Rust-based real estate recommendation system that matches pro
 ```bash
 git clone <repository-url>
 cd real-estate-recommender
-./setup.sh
+docker-compose up --build
+DATABASE_URL=postgresql://postgres:password@localhost:5432/real_estate_db; python migrate_data.py
 ```
 
 ### Manual Setup

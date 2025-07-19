@@ -1,61 +1,61 @@
 LATENCY TEST REPORT
 ==================================================
-Generated: 2025-07-18 23:13:58
+Generated: 2025-07-19 02:17:34
 Total tests: 2485
 Successful tests: 2485 (100.0%)
 
 OVERALL RESPONSE TIME STATISTICS
 ----------------------------------------
-Mean: 5.19 ms
-Median: 5.04 ms
-Min: 2.73 ms
-Max: 12.93 ms
-Standard Deviation: 1.06 ms
-95th Percentile: 7.10 ms
-99th Percentile: 8.60 ms
+Mean: 1.23 ms
+Median: 0.75 ms
+Min: 0.40 ms
+Max: 8.43 ms
+Standard Deviation: 0.97 ms
+95th Percentile: 3.24 ms
+99th Percentile: 4.13 ms
 
 SINGLE_PROPERTY ENDPOINT STATISTICS
 ----------------------------------------
 Tests: 1988
-Mean response time: 4.90 ms
-Median response time: 4.87 ms
-Min response time: 2.73 ms
-Max response time: 10.43 ms
-95th Percentile: 6.22 ms
+Mean response time: 0.82 ms
+Median response time: 0.69 ms
+Min response time: 0.40 ms
+Max response time: 3.89 ms
+95th Percentile: 1.80 ms
 
 BULK_RECOMMENDATIONS ENDPOINT STATISTICS
 ----------------------------------------
 Tests: 497
-Mean response time: 6.37 ms
-Median response time: 6.24 ms
-Min response time: 3.46 ms
-Max response time: 12.93 ms
-95th Percentile: 8.56 ms
+Mean response time: 2.88 ms
+Median response time: 2.78 ms
+Min response time: 1.58 ms
+Max response time: 8.43 ms
+95th Percentile: 4.13 ms
 
 FILTERING SCENARIO ANALYSIS
 ----------------------------------------
 Basic Filtering:
   Tests: 497
-  Mean: 5.19 ms
-  Median: 5.04 ms
-  95th Percentile: 7.07 ms
+  Mean: 1.23 ms
+  Median: 0.77 ms
+  95th Percentile: 3.29 ms
 Top K 5:
   Tests: 497
-  Mean: 5.20 ms
-  Median: 5.07 ms
-  95th Percentile: 7.11 ms
+  Mean: 1.22 ms
+  Median: 0.74 ms
+  95th Percentile: 3.24 ms
 Top Percentile 20:
   Tests: 497
-  Mean: 5.18 ms
-  Median: 5.03 ms
-  95th Percentile: 7.11 ms
+  Mean: 1.21 ms
+  Median: 0.76 ms
+  95th Percentile: 3.15 ms
 Combined Filtering:
   Tests: 497
-  Mean: 5.21 ms
-  Median: 5.05 ms
-  95th Percentile: 6.95 ms
+  Mean: 1.25 ms
+  Median: 0.75 ms
+  95th Percentile: 3.20 ms
 Threshold Percentile:
   Tests: 497
-  Mean: 5.18 ms
-  Median: 5.01 ms
-  95th Percentile: 7.08 ms
+  Mean: 1.23 ms
+  Median: 0.76 ms
+  95th Percentile: 3.33 ms

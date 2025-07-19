@@ -23,7 +23,7 @@ def connect_to_database() -> psycopg2.extensions.connection:
     """Connect to PostgreSQL database"""
     try:
         # Use DATABASE_URL from environment or default
-        database_url = os.getenv('DATABASE_URL', 'postgresql:///real_estate_db')
+        database_url = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost:5432/real_estate_db')
         conn = psycopg2.connect(database_url)
         conn.autocommit = False
         return conn

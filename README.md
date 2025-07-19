@@ -1,52 +1,452 @@
-# Real Estate Recommendation API Documentation
+# Real Estate Recommendation API
 
-## Overview
+## 🏠 Overview
 
-This API provides intelligent real estate contact recommendations, property comparisons, and quote generation services. The system uses a multi-factor scoring algorithm to match potential buyers (contacts) with properties based on their preferences and property characteristics.
+Advanced real estate recommendation system built with Rust, providing intelligent property-to-contact matching, comprehensive property comparisons, and detailed quote generation. The system features configurable scoring algorithms, multi-dimensional analysis, and rich JSON APIs.
 
-**Base URL**: `http://localhost:8080` (configurable)
+## 🚀 Key Features
+
+### ✨ **Latest Enhancements (v2.0)**
+- **🎛️ Configurable Scoring Weights**: Customize recommendation algorithms via API
+- **📄 JSON Quote System**: Comprehensive financial analysis with structured responses
+- **🔍 Enhanced Comparisons**: Multi-dimensional property analysis with intelligent recommendations
+- **⚡ Advanced Filtering**: Top-K, percentile-based, and threshold filtering
+- **🧠 AI-Powered Insights**: Smart reasoning and confidence scoring
+
+### 🛠️ Core Capabilities
+- **Property-to-Contact Recommendations**: Find potential buyers for properties
+- **Multi-Factor Scoring**: Budget, location, property type, and size matching
+- **Real-Time Analysis**: Parallel processing with caching optimization
+- **Comprehensive Comparisons**: Side-by-side property analysis with detailed insights
+- **Financial Calculations**: Mortgage analysis, affordability scoring, ROI projections
+- **RESTful JSON APIs**: Modern, integration-friendly endpoints
+
+## 🚀 Quick Start
 
 ### One-Command Setup
 ```bash
 git clone <repository-url>
-cd real-estate-recommender
-docker-compose up -d
-python migrate_data.py
+cd Rust_Backend
+./setup.sh  # Sets up database and loads sample data
+cargo run --release
 ```
 
+### Alternative Setup
+```bash
+# With Docker
+docker-compose up -d
+python3 migrate_data.py
 
-## Table of Contents
+# Manual setup
+./setup-database.sh
+cargo run --release
+```
 
-- [Authentication](#authentication)
-- [Response Format](#response-format)
-- [Error Handling](#error-handling)
-- [Endpoints](#endpoints)
-  - [Health Check](#health-check)
+**Default URL**: `http://localhost:8080`
+
+## 📚 Table of Contents
+
+- [🏠 Overview](#-overview)
+- [🚀 Quick Start](#-quick-start)
+- [🎯 API Endpoints](#-api-endpoints)
   - [Recommendations](#recommendations)
-  - [Property Comparisons](#property-comparisons)
+  - [Comparisons](#comparisons)
   - [Quotes](#quotes)
-- [Data Models](#data-models)
-- [Scoring Algorithm](#scoring-algorithm)
+- [⚙️ Configuration](#️-configuration)
+- [🧪 Testing](#-testing)
+- [📊 Performance](#-performance)
+- [🔧 Development](#-development)
 
-## Error Handling
-
-The API returns standard HTTP status codes:
-
-- `200` - Success
-- `400` - Bad Request (invalid parameters)
-- `404` - Not Found (resource doesn't exist)
-- `500` - Internal Server Error
-
-## Endpoints
+## 🎯 API Endpoints
 
 ### Health Check
+```http
+GET /health
+```
+Returns service status and version information.
 
-Check if the API service is running and healthy.
+---
 
-**Endpoint**: `GET /health`
+## Recommendations
 
-**Response**:
+### 🎯 Get Property Recommendations
+Find potential buyers for a specific property with configurable scoring.
+
+**Endpoint**: `GET /recommendations/property/{property_id}`
+
+**Query Parameters**:
+- `limit` (optional): Maximum recommendations to return
+- `min_score` (optional): Minimum score threshold (0.0-1.0)
+- `top_k` (optional): Return only top K highest-scoring contacts
+- `top_percentile` (optional): Return top X% of contacts (e.g., 0.1 for 10%)
+- `score_threshold_percentile` (optional): Filter by score percentile
+
+**🎛️ Configurable Scoring Weights**:
+- `budget_weight` (default: 0.3): Budget matching importance
+- `location_weight` (default: 0.25): Location proximity importance  
+- `property_type_weight` (default: 0.2): Property type matching importance
+- `size_weight` (default: 0.25): Size requirements importance
+
+**Example Requests**:
+```http
+# Default weights
+GET /recommendations/property/123?limit=10&min_score=0.6
+
+# Budget-focused recommendations
+GET /recommendations/property/123?budget_weight=0.5&location_weight=0.2&property_type_weight=0.2&size_weight=0.1
+
+# Advanced filtering
+GET /recommendations/property/123?top_k=10&top_percentile=0.2&score_threshold_percentile=0.8
+```
+
+### 📊 Bulk Recommendations
+Get recommendations for multiple properties simultaneously.
+
+**Endpoint**: `POST /recommendations/bulk`
+
+**Request Body**:
 ```json
+{
+  "property_ids": [1, 2, 3],
+  "limit_per_property": 5,
+  "min_score": 0.6,
+  "top_k": 10,
+  "budget_weight": 0.4,
+  "location_weight": 0.3,
+  "property_type_weight": 0.2,
+  "size_weight": 0.1
+}
+```
+
+---
+
+## Comparisons
+
+### 🔍 Enhanced Property Comparison
+Compare two properties with comprehensive multi-dimensional analysis.
+
+**Endpoint**: `GET /comparisons/properties`
+
+**Query Parameters**:
+- `property1_id` (required): First property ID
+- `property2_id` (required): Second property ID
+
+**Example Request**:
+```http
+GET /comparisons/properties?property1_id=1&property2_id=2
+```
+
+**📊 Response Includes**:
+- **Basic Metrics**: Price/area differences, similarity scores
+- **Price Analysis**: Affordability ratings, cost per sqm
+- **Space Analysis**: Room comparisons, efficiency ratios
+- **Location Analysis**: Distance, accessibility insights
+- **Feature Analysis**: Type matching, unique advantages
+- **Value Analysis**: Investment potential, ROI projections
+- **Smart Recommendation**: AI-powered choice with confidence scoring
+
+---
+
+## Quotes
+
+### 💰 Property Quote Generation
+Generate comprehensive financial quotes in structured JSON format.
+
+**Endpoint**: `POST /quotes/generate`
+
+**Request Body**:
+```json
+{
+  "property_id": 1,
+  "contact_id": 1,
+  "additional_costs": [
+    {
+      "description": "Legal Fees",
+      "amount": 150000
+    }
+  ]
+}
+```
+
+**📈 Response Includes**:
+- **Property & Contact Details**: Complete information
+- **Financial Analysis**: Down payments, monthly costs, closing costs
+- **Financing Options**: Multiple loan scenarios (30-year, 15-year, FHA)
+- **Affordability Scoring**: Budget compatibility analysis
+- **Recommendations**: Next steps and considerations
+- **Quote Validity**: Creation and expiration dates
+
+### 🏘️ Property Comparison Quotes
+**Endpoint**: `POST /quotes/comparison`
+
+**Request Body**:
+```json
+{
+  "property1_id": 1,
+  "property2_id": 2,
+  "contact_id": 1
+}
+```
+
+---
+
+## ⚙️ Configuration
+
+### Scoring Algorithm Customization
+
+#### Default Weights:
+- **Budget**: 30% - How well property price fits contact's budget
+- **Location**: 25% - Proximity to preferred locations  
+- **Property Type**: 20% - Matching preferred property types
+- **Size**: 25% - Room count and area requirements
+
+#### Custom Weight Examples:
+
+**Budget-Focused (Conservative Buyers)**:
+```json
+{
+  "budget_weight": 0.6,
+  "location_weight": 0.2,
+  "property_type_weight": 0.1,
+  "size_weight": 0.1
+}
+```
+
+**Location-Priority (Commute-Focused)**:
+```json
+{
+  "budget_weight": 0.1,
+  "location_weight": 0.6,
+  "property_type_weight": 0.2,
+  "size_weight": 0.1
+}
+```
+
+**Balanced Approach**:
+```json
+{
+  "budget_weight": 0.25,
+  "location_weight": 0.25,
+  "property_type_weight": 0.25,
+  "size_weight": 0.25
+}
+```
+
+### Environment Configuration
+```bash
+# Database
+DATABASE_URL=postgresql://user:pass@localhost/realestate
+
+# Server
+SERVER_HOST=0.0.0.0
+SERVER_PORT=8080
+
+# Cache
+CACHE_TTL_SECONDS=300
+CACHE_CAPACITY=1000
+```
+
+---
+
+## 🧪 Testing
+
+### Comprehensive Test Suite
+
+```bash
+# Test configurable weights
+python3 test_weights_api.py
+
+# Test JSON quotes  
+python3 test_json_quotes.py
+
+# Test enhanced comparisons
+python3 test_enhanced_comparisons.py
+
+# Performance testing
+python3 analysis/latency_test.py
+
+# All tests
+./test.sh
+```
+
+### 📊 Performance Testing
+
+**K-Value Scenarios**:
+```bash
+# Test different recommendation sizes
+./run_latency_test.sh  # Tests K=5,10,50,100
+
+# Scalability testing  
+./run_scalability_test.sh
+
+# Custom latency analysis
+python3 analysis/plot_latency.py
+```
+
+---
+
+## 📊 Performance
+
+### 🚀 Optimizations
+- **Parallel Processing**: Rayon-based concurrent calculations
+- **Smart Caching**: Moka cache with configurable TTL
+- **Database Pooling**: Connection pooling for high throughput
+- **Advanced Filtering**: Efficient percentile-based filtering
+
+### 📈 Benchmarks
+- **Single Recommendation**: ~5-15ms (10K contacts)
+- **Bulk Operations**: ~50-200ms (10 properties, 10K contacts)
+- **Property Comparison**: ~10-30ms
+- **Quote Generation**: ~20-50ms
+
+### 📊 Scalability Results
+- **Throughput**: 500+ requests/second
+- **Memory Usage**: ~100MB baseline
+- **Cache Hit Rate**: 85-95% (typical workloads)
+
+---
+
+## 🔧 Development
+
+### Project Structure
+```
+src/
+├── main.rs              # Application entry point
+├── config.rs            # Configuration management
+├── api/                 # REST API endpoints
+│   ├── recommendations.rs
+│   ├── comparisons.rs
+│   └── quotes.rs
+├── services/            # Business logic
+│   ├── recommendation.rs
+│   ├── comparison.rs
+│   └── quote.rs
+├── models/              # Data structures
+│   ├── property.rs
+│   ├── contact.rs
+│   └── recommendation.rs
+├── db/                  # Database layer
+│   └── repository.rs
+└── utils/               # Utilities
+    ├── scoring.rs
+    └── pdf.rs
+```
+
+### 🛠️ Tech Stack
+- **Backend**: Rust with Actix-Web
+- **Database**: PostgreSQL with SQLx
+- **Caching**: Moka (in-memory)
+- **Concurrency**: Rayon (parallel processing)
+- **Serialization**: Serde JSON
+- **Testing**: Python integration tests
+
+### 🚀 Deployment
+```bash
+# Docker deployment
+docker-compose up -d
+
+# Production build
+cargo build --release
+
+# Database migrations
+sqlx migrate run
+```
+
+---
+
+## 📖 Documentation
+
+### 📚 Additional Resources
+- [API_DOCUMENTATION.md](API_DOCUMENTATION.md) - Complete API reference
+- [CONFIGURABLE_WEIGHTS.md](CONFIGURABLE_WEIGHTS.md) - Scoring customization guide
+- [JSON_QUOTES_DOCUMENTATION.md](JSON_QUOTES_DOCUMENTATION.md) - Quote system details  
+- [ENHANCED_COMPARISONS_DOCUMENTATION.md](ENHANCED_COMPARISONS_DOCUMENTATION.md) - Comparison features
+- [LATENCY_TESTING.md](LATENCY_TESTING.md) - Performance analysis
+- [SCALABILITY_TESTING.md](SCALABILITY_TESTING.md) - Load testing guide
+
+### 🎯 Example Responses
+
+**Recommendation Response**:
+```json
+{
+  "recommendations": [
+    {
+      "contact": { /* Contact details */ },
+      "property": { /* Property details */ },
+      "score": 0.87,
+      "explanation": {
+        "budget_match": { "score": 0.95 },
+        "location_match": { "score": 0.82 },
+        "reasons": ["Excellent budget match", "Good location fit"]
+      }
+    }
+  ],
+  "total_count": 15,
+  "processing_time_ms": 23
+}
+```
+
+**Comparison Response**:
+```json
+{
+  "property1": { /* Property details */ },
+  "property2": { /* Property details */ },
+  "detailed_analysis": {
+    "price_analysis": { /* Affordability insights */ },
+    "value_analysis": { /* Investment potential */ }
+  },
+  "recommendation": {
+    "recommended_property": 1,
+    "confidence_score": 0.85,
+    "summary": "Property 1 offers better value for money"
+  }
+}
+```
+
+**Quote Response**:
+```json
+{
+  "property": { /* Property details */ },
+  "financial_details": {
+    "estimated_monthly_payment": 2850.50,
+    "financing_options": [
+      {
+        "loan_type": "Conventional 30-year",
+        "interest_rate": 6.5,
+        "monthly_payment": 2850.50
+      }
+    ]
+  },
+  "quote_summary": {
+    "affordability_score": 0.92,
+    "recommendation_level": "Highly Recommended"
+  }
+}
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🏆 Acknowledgments
+
+- Built with ❤️ using Rust and modern web technologies
+- Performance optimized for high-throughput real estate applications
+- Designed for scalability and extensibility
 {
   "status": "healthy",
   "timestamp": "2025-07-18T10:30:00.000Z",

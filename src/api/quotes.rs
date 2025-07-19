@@ -42,21 +42,21 @@ pub struct RecommendationQuoteQuery {
     pub property_id: i32,
 }
 
-// pub async fn generate_recommendation_quote(
-//     query: web::Query<RecommendationQuoteQuery>,
-//     _quote_service: web::Data<QuoteService>,
-// ) -> Result<HttpResponse> {
-//     // For now, return a JSON template response
-//     let response = serde_json::json!({
-//         "property_id": query.property_id,
-//         "message": "Recommendation quote in JSON format",
-//         "recommendations": [],
-//         "generated_at": chrono::Utc::now().to_rfc3339(),
-//         "status": "Template response - integrate with recommendation service"
-//     });
+pub async fn generate_recommendation_quote(
+    query: web::Query<RecommendationQuoteQuery>,
+    _quote_service: web::Data<QuoteService>,
+) -> Result<HttpResponse> {
+    // For now, return a JSON template response
+    let response = serde_json::json!({
+        "property_id": query.property_id,
+        "message": "Recommendation quote in JSON format",
+        "recommendations": [],
+        "generated_at": chrono::Utc::now().to_rfc3339(),
+        "status": "Template response - integrate with recommendation service"
+    });
 
-//     Ok(HttpResponse::Ok().json(response))
-// }
+    Ok(HttpResponse::Ok().json(response))
+}
 
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

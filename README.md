@@ -309,7 +309,7 @@ Generate a PDF quote comparing two properties.
 - Content-Disposition: `attachment; filename="property_comparison.pdf"`
 - Body: PDF file data
 
-### Generate Recommendation Quote
+<!-- ### Generate Recommendation Quote -->
 
 Generate a quote based on property recommendations (Not yet implemented).
 

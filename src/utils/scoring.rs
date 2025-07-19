@@ -1,4 +1,5 @@
 use crate::models::{Contact, Property};
+use crate::ml::weight_adjuster::{WeightAdjuster, Weights};
 
 pub fn calculate_distance_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     const EARTH_RADIUS_KM: f64 = 6371.0;
@@ -109,15 +110,47 @@ pub fn calculate_overall_score(
     location_score: f64,
     property_type_score: f64,
     size_score: f64,
+    weight_adjuster: Option<&WeightAdjuster>,
+    location: Option<&str>,
+    property_type: Option<&str>,
 ) -> f64 {
-    // Weighted scoring with different importance levels
-    const BUDGET_WEIGHT: f64 = 0.3;
-    const LOCATION_WEIGHT: f64 = 0.25;
-    const PROPERTY_TYPE_WEIGHT: f64 = 0.2;
-    const SIZE_WEIGHT: f64 = 0.25;
+    // Use dynamic weights if adjuster and required parameters are provided
+    let weights = if let (Some(adjuster), Some(loc), Some(prop_type)) = (weight_adjuster, location, property_type) {
+        adjuster.get_adjusted_weights(loc, prop_type)
+    } else {
+        // Fallback to default weights if adjuster is not provided
+        Weights::default()
+    };
 
-    budget_score * BUDGET_WEIGHT
-        + location_score * LOCATION_WEIGHT
-        + property_type_score * PROPERTY_TYPE_WEIGHT
-        + size_score * SIZE_WEIGHT
+    budget_score * weights.budget
+        + location_score * weights.location
+        + property_type_score * weights.property_type
+        + size_score * weights.size
+}
+
+/// Calculate score with dynamic weights based on market conditions
+pub fn calculate_dynamic_score(
+    property: &Property,
+    contact: &Contact,
+    weight_adjuster: &WeightAdjuster,
+) -> f64 {
+    let budget_score = calculate_budget_score(
+        property.price,
+        contact.budget_min.unwrap_or(0.0),
+        contact.budget_max.unwrap_or(f64::MAX),
+    );
+    
+    let location_score = calculate_location_score(property, contact);
+    let property_type_score = calculate_property_type_score(property, contact);
+    let size_score = calculate_size_score(property, contact);
+
+    calculate_overall_score(
+        budget_score,
+        location_score,
+        property_type_score,
+        size_score,
+        Some(weight_adjuster),
+        property.location.as_deref(),
+        property.property_type.as_deref(),
+    )
 }

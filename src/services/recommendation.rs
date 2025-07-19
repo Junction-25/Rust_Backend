@@ -1,6 +1,7 @@
 use crate::db::Repository;
 use crate::models::*;
 use crate::utils::scoring::*;
+use crate::ml::weight_adjuster::WeightAdjuster;
 use anyhow::Result;
 use chrono::Utc;
 use std::sync::Arc;
@@ -12,10 +13,16 @@ use std::time::Duration;
 pub struct RecommendationService {
     repository: Arc<Repository>,
     cache: Cache<String, Vec<Recommendation>>,
+    weight_adjuster: Option<Arc<WeightAdjuster>>,
 }
 
 impl RecommendationService {
-    pub fn new(repository: Arc<Repository>, cache_ttl: Duration, cache_capacity: u64) -> Self {
+    pub fn new(
+        repository: Arc<Repository>,
+        cache_ttl: Duration,
+        cache_capacity: u64,
+        weight_adjuster: Option<WeightAdjuster>,
+    ) -> Self {
         let cache = Cache::builder()
             .time_to_live(cache_ttl)
             .max_capacity(cache_capacity)
@@ -24,6 +31,7 @@ impl RecommendationService {
         Self {
             repository,
             cache,
+            weight_adjuster: weight_adjuster.map(Arc::new),
         }
     }
 
@@ -272,13 +280,22 @@ impl RecommendationService {
         let property_type_score = calculate_property_type_score(property, contact);
         let size_score = calculate_size_score(property, contact);
 
-        // Calculate overall score
-        let overall_score = calculate_overall_score(
-            budget_score,
-            location_score,
-            property_type_score,
-            size_score,
-        );
+        // Calculate overall score with dynamic weights if adjuster is available
+        let overall_score = if let Some(adjuster) = &self.weight_adjuster {
+            // Use dynamic scoring with market-aware weights
+            calculate_dynamic_score(property, contact, adjuster)
+        } else {
+            // Fallback to static weights
+            calculate_overall_score(
+                budget_score,
+                location_score,
+                property_type_score,
+                size_score,
+                None,
+                None,
+                None,
+            )
+        };
 
         // Calculate closest distance to preferred locations
         let min_distance = if !contact.preferred_locations.is_empty() {

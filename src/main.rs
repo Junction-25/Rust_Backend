@@ -35,11 +35,23 @@ async fn main() -> std::io::Result<()> {
     // Setup repository
     let repository = Arc::new(db::Repository::new(database_pool));
 
+    // Initialize market trends and weight adjuster
+    let market_trends = Arc::new(std::sync::RwLock::new(
+        std::collections::HashMap::<String, ml::market_trends::MarketTrend>::new()
+    ));
+    
+    // Create weight adjuster with default config
+    let weight_adjuster = ml::weight_adjuster::WeightAdjuster::new(None);
+    
+    // In a real application, you would update market trends periodically
+    // For example, using a background task or an API endpoint
+    
     // Setup services
     let recommendation_service = services::RecommendationService::new(
         repository.clone(),
         Duration::from_secs(config.recommendation.cache_ttl_seconds),
         config.cache.max_capacity,
+        Some(weight_adjuster),
     );
     
     let comparison_service = services::ComparisonService::new(repository.clone());

@@ -66,3 +66,10 @@ pub struct ComparisonMetrics {
     pub location_distance_km: f64,
     pub overall_similarity_score: f64,
 }
+
+impl Property {
+    pub fn get_all(_connection: &mut crate::utils::database::Connection) -> anyhow::Result<Vec<Property>> {
+        // For now, return empty vector - in real implementation, query from database
+        Ok(Vec::new())
+    }
+}

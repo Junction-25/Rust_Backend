@@ -1,10 +1,12 @@
 use crate::db::Repository;
 use crate::models::*;
 use crate::utils::scoring::*;
+use crate::utils::feature_engineering::{NeuralBinner, LocationAttentionPooler};
 use crate::ml::weight_adjuster::WeightAdjuster;
 use anyhow::Result;
 use chrono::Utc;
 use std::sync::Arc;
+use std::collections::HashMap;
 use rayon::prelude::*;
 use moka::future::Cache;
 use std::time::Duration;
@@ -14,6 +16,11 @@ pub struct RecommendationService {
     repository: Arc<Repository>,
     cache: Cache<String, Vec<Recommendation>>,
     weight_adjuster: Option<Arc<WeightAdjuster>>,
+    // Phase 1 enhancements
+    neural_binner: Arc<NeuralBinner>,
+    location_pooler: Arc<LocationAttentionPooler>,
+    location_embeddings: Arc<HashMap<String, Vec<f32>>>,
+    enable_neural_scoring: bool,
 }
 
 impl RecommendationService {
@@ -28,11 +35,48 @@ impl RecommendationService {
             .max_capacity(cache_capacity)
             .build();
 
+        // Initialize Phase 1 components
+        let neural_binner = Arc::new(NeuralBinner::new());
+        let location_pooler = Arc::new(LocationAttentionPooler::default());
+        let location_embeddings = Arc::new(Self::initialize_location_embeddings());
+
         Self {
             repository,
             cache,
             weight_adjuster: weight_adjuster.map(Arc::new),
+            neural_binner,
+            location_pooler,
+            location_embeddings,
+            enable_neural_scoring: true, // Enable by default for Phase 1
         }
+    }
+
+    // Initialize dummy location embeddings - Phase 1
+    fn initialize_location_embeddings() -> HashMap<String, Vec<f32>> {
+        let mut embeddings = HashMap::new();
+        
+        // Generate some dummy location embeddings for common coordinates
+        // In a real implementation, these would be learned from data
+        for lat in (40..60).step_by(5) {
+            for lon in (2..30).step_by(5) {
+                let key = format!("{}_{}", lat, lon);
+                let mut embedding = Vec::new();
+                
+                // Generate pseudo-random embedding based on coordinates
+                for i in 0..32 {
+                    let seed = (lat as f32 + lon as f32 + i as f32) * 0.1;
+                    embedding.push(seed.sin() * 0.5 + 0.5);
+                }
+                
+                embeddings.insert(key, embedding);
+            }
+        }
+        
+        embeddings
+    }
+
+    pub fn toggle_neural_scoring(&mut self, enable: bool) {
+        self.enable_neural_scoring = enable;
     }
 
     pub async fn get_recommendations_for_property(
@@ -44,12 +88,34 @@ impl RecommendationService {
         top_percentile: Option<f64>,
         score_threshold_percentile: Option<f64>,
     ) -> Result<RecommendationResponse> {
+        self.get_recommendations_for_property_with_neural(
+            property_id,
+            limit,
+            min_score,
+            top_k,
+            top_percentile,
+            score_threshold_percentile,
+            None,
+        ).await
+    }
+
+    pub async fn get_recommendations_for_property_with_neural(
+        &self,
+        property_id: i32,
+        limit: Option<usize>,
+        min_score: Option<f64>,
+        top_k: Option<usize>,
+        top_percentile: Option<f64>,
+        score_threshold_percentile: Option<f64>,
+        neural_scoring_override: Option<bool>,
+    ) -> Result<RecommendationResponse> {
         let start_time = std::time::Instant::now();
         
-        // Check cache first
+        // Check cache first (include neural mode in cache key)
+        let neural_mode = neural_scoring_override.unwrap_or(self.enable_neural_scoring);
         let cache_key = format!(
-            "property_{}_{:?}_{:?}_{:?}_{:?}_{:?}", 
-            property_id, limit, min_score, top_k, top_percentile, score_threshold_percentile
+            "property_{}_{:?}_{:?}_{:?}_{:?}_{:?}_{}", 
+            property_id, limit, min_score, top_k, top_percentile, score_threshold_percentile, neural_mode
         );
         if let Some(cached_recommendations) = self.cache.get(&cache_key).await {
             return Ok(RecommendationResponse {
@@ -68,7 +134,7 @@ impl RecommendationService {
         // Calculate recommendations in parallel
         let mut all_recommendations: Vec<Recommendation> = contacts
             .par_iter()
-            .map(|contact| self.calculate_recommendation(contact, &property))
+            .map(|contact| self.calculate_recommendation_with_mode(contact, &property, neural_mode))
             .collect();
 
         // Sort by score (highest first) first for percentile calculations
@@ -107,12 +173,34 @@ impl RecommendationService {
         top_percentile: Option<f64>,
         score_threshold_percentile: Option<f64>,
     ) -> Result<RecommendationResponse> {
+        self.get_recommendations_for_contact_with_neural(
+            contact_id,
+            limit,
+            min_score,
+            top_k,
+            top_percentile,
+            score_threshold_percentile,
+            None,
+        ).await
+    }
+
+    pub async fn get_recommendations_for_contact_with_neural(
+        &self,
+        contact_id: i32,
+        limit: Option<usize>,
+        min_score: Option<f64>,
+        top_k: Option<usize>,
+        top_percentile: Option<f64>,
+        score_threshold_percentile: Option<f64>,
+        neural_scoring_override: Option<bool>,
+    ) -> Result<RecommendationResponse> {
         let start_time = std::time::Instant::now();
         
-        // Check cache first
+        // Check cache first (include neural mode in cache key)
+        let neural_mode = neural_scoring_override.unwrap_or(self.enable_neural_scoring);
         let cache_key = format!(
-            "contact_{}_{:?}_{:?}_{:?}_{:?}_{:?}", 
-            contact_id, limit, min_score, top_k, top_percentile, score_threshold_percentile
+            "contact_{}_{:?}_{:?}_{:?}_{:?}_{:?}_{}", 
+            contact_id, limit, min_score, top_k, top_percentile, score_threshold_percentile, neural_mode
         );
         if let Some(cached_recommendations) = self.cache.get(&cache_key).await {
             return Ok(RecommendationResponse {
@@ -131,7 +219,7 @@ impl RecommendationService {
         // Calculate recommendations in parallel
         let mut all_recommendations: Vec<Recommendation> = properties
             .par_iter()
-            .map(|property| self.calculate_recommendation(&contact, property))
+            .map(|property| self.calculate_recommendation_with_mode(&contact, property, neural_mode))
             .collect();
 
         // Sort by score (highest first) first for percentile calculations
@@ -155,7 +243,6 @@ impl RecommendationService {
         Ok(RecommendationResponse {
             total_count: final_recommendations.len(),
             recommendations: final_recommendations,
-            // recommendations: sorted_recommendations,
             processing_time_ms: processing_time,
         })
     }
@@ -274,15 +361,29 @@ impl RecommendationService {
     }
 
     fn calculate_recommendation(&self, contact: &Contact, property: &Property) -> Recommendation {
-        // Calculate individual scores
+        self.calculate_recommendation_with_mode(contact, property, self.enable_neural_scoring)
+    }
+
+    fn calculate_recommendation_with_mode(&self, contact: &Contact, property: &Property, neural_mode: bool) -> Recommendation {
+        // Calculate individual component scores for explanation (always calculated)
         let budget_score = calculate_budget_score(property.price, contact.min_budget, contact.max_budget);
         let location_score = calculate_location_score(property, contact);
         let property_type_score = calculate_property_type_score(property, contact);
         let size_score = calculate_size_score(property, contact);
 
-        // Calculate overall score with dynamic weights if adjuster is available
-        let overall_score = if let Some(adjuster) = &self.weight_adjuster {
-            // Use dynamic scoring with market-aware weights
+        // Choose overall scoring method based on mode
+        let overall_score = if neural_mode {
+            // Phase 1: Neural-enhanced scoring
+            calculate_neural_enhanced_score(
+                property,
+                contact,
+                &self.neural_binner,
+                &self.location_embeddings,
+                &self.location_pooler,
+                self.weight_adjuster.as_deref(),
+            )
+        } else if let Some(adjuster) = &self.weight_adjuster {
+            // Dynamic scoring with market-aware weights
             calculate_dynamic_score(property, contact, adjuster)
         } else {
             // Fallback to static weights
@@ -296,6 +397,13 @@ impl RecommendationService {
                 None,
             )
         };
+
+        // Calculate additional metrics
+        let feature_compatibility = calculate_feature_compatibility(
+            property,
+            contact,
+            &self.neural_binner,
+        );
 
         // Calculate closest distance to preferred locations
         let min_distance = if !contact.preferred_locations.is_empty() {

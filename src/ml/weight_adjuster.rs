@@ -125,7 +125,7 @@ impl WeightAdjuster {
         let now = std::time::SystemTime::now();
         
         // Initialize with some default active conditions
-        let mut active_conditions = Vec::new();
+        let active_conditions = Vec::new();
         
         // Example: Start with no active conditions
         // In a real system, you'd load these from a database or API
@@ -168,7 +168,7 @@ impl WeightAdjuster {
     }
     
     /// Detect market conditions based on current trends
-    fn detect_conditions(&mut self, trend: &MarketTrend) -> Vec<(MarketCondition, f64, f64)> {
+    fn detect_conditions(&self, trend: &MarketTrend) -> Vec<(MarketCondition, f64, f64)> {
         let mut conditions = Vec::new();
         let config = &self.config.adjustment_factors;
         
@@ -324,21 +324,15 @@ impl WeightAdjuster {
         
         adjusted_weights
     }
-        
-        // Get the relevant market trend if available
-        let trend_key = format!("{}:{}", location, property_type);
-        if let Some(trend) = self.market_trends.get(&trend_key) {
-            // Adjust weights based on inventory levels
-            self.adjust_for_inventory(trend, &mut adjusted_weights);
-            
-            // Adjust weights based on price volatility
-            self.adjust_for_volatility(trend, &mut adjusted_weights);
-            
-            // Ensure weights are still valid (sum to 1.0 and within bounds)
-            self.normalize_weights(&mut adjusted_weights);
+    
+    fn normalize_weights(&self, weights: &mut Weights) {
+        let total = weights.budget + weights.location + weights.property_type + weights.size;
+        if total > 0.0 {
+            weights.budget /= total;
+            weights.location /= total;
+            weights.property_type /= total;
+            weights.size /= total;
         }
-        
-        adjusted_weights
     }
     
     fn adjust_for_inventory(&self, trend: &MarketTrend, weights: &mut Weights) {
@@ -393,16 +387,6 @@ impl WeightAdjuster {
                 weights.property_type = (weights.property_type - decrease_per_weight * property_type_ratio).max(0.0);
                 weights.size = (weights.size - decrease_per_weight * size_ratio).max(0.0);
             }
-        }
-    }
-    
-    fn normalize_weights(&self, weights: &mut Weights) {
-        let total = weights.budget + weights.location + weights.property_type + weights.size;
-        if total > 0.0 {
-            weights.budget /= total;
-            weights.location /= total;
-            weights.property_type /= total;
-            weights.size /= total;
         }
     }
 }

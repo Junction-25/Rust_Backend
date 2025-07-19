@@ -1,6 +1,7 @@
-pub mod properties;
 pub mod contacts;
+pub mod properties;
 pub mod recommendations;
+pub mod advanced_recommendations;
 pub mod comparisons;
 pub mod quotes;
 pub mod ai;

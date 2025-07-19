@@ -1,4 +1,5 @@
 pub mod recommendation;
+pub mod advanced_recommendation;
 pub mod comparison;
 pub mod quote;
 pub mod ai_recommendations;

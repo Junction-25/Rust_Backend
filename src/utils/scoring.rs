@@ -1,5 +1,7 @@
 use crate::models::{Contact, Property};
 use crate::ml::weight_adjuster::{WeightAdjuster, Weights};
+use crate::utils::feature_engineering::{NeuralBinner, LocationAttentionPooler, cosine_similarity};
+use std::collections::HashMap;
 
 pub fn calculate_distance_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     const EARTH_RADIUS_KM: f64 = 6371.0;
@@ -72,6 +74,67 @@ pub fn calculate_location_score(property: &Property, contact: &Contact) -> f64 {
     best_score
 }
 
+// Enhanced location score with attention pooling
+pub fn calculate_enhanced_location_score(
+    property: &Property,
+    contact: &Contact,
+    location_embeddings: &HashMap<String, Vec<f32>>,
+    pooler: &LocationAttentionPooler,
+) -> f64 {
+    if contact.preferred_locations.is_empty() {
+        return 0.5;
+    }
+
+    // Calculate distances and collect embeddings
+    let mut distances = Vec::new();
+    let mut pref_embeddings = Vec::new();
+    let mut similarity_scores = Vec::new();
+
+    // Get property location embedding (create a dummy one for now)
+    let property_location_embedding = location_embeddings
+        .get(&format!("{}_{}", property.location.lat as i32, property.location.lon as i32))
+        .cloned()
+        .unwrap_or_else(|| vec![0.1; 32]);
+
+    for preferred_location in &contact.preferred_locations {
+        let distance = calculate_distance_km(
+            property.location.lat,
+            property.location.lon,
+            preferred_location.lat,
+            preferred_location.lon,
+        );
+        
+        distances.push(distance);
+
+        // Get embedding for preferred location (create dummy for now)
+        let pref_embedding = location_embeddings
+            .get(&format!("{}_{}", preferred_location.lat as i32, preferred_location.lon as i32))
+            .cloned()
+            .unwrap_or_else(|| vec![0.2; 32]);
+
+        // Calculate similarity
+        let similarity = cosine_similarity(&property_location_embedding, &pref_embedding);
+        similarity_scores.push(similarity);
+        pref_embeddings.push(pref_embedding);
+    }
+
+    // Calculate attention weights based on distances
+    let attention_weights = pooler.calculate_attention_weights(&distances);
+
+    // Combine similarity scores with attention weights
+    let mut weighted_similarity = 0.0;
+    for (similarity, weight) in similarity_scores.iter().zip(attention_weights.iter()) {
+        weighted_similarity += similarity * weight;
+    }
+
+    // Combine with traditional distance-based scoring
+    let traditional_score = calculate_location_score(property, contact);
+    
+    // Weighted combination of traditional and enhanced scoring
+    let alpha = 0.7; // Weight for traditional scoring
+    alpha * traditional_score + (1.0 - alpha) * weighted_similarity.max(0.0).min(1.0)
+}
+
 pub fn calculate_property_type_score(property: &Property, contact: &Contact) -> f64 {
     if contact.property_types.is_empty() {
         return 0.5; // Neutral score if no type preference
@@ -136,8 +199,8 @@ pub fn calculate_dynamic_score(
 ) -> f64 {
     let budget_score = calculate_budget_score(
         property.price,
-        contact.budget_min.unwrap_or(0.0),
-        contact.budget_max.unwrap_or(f64::MAX),
+        contact.min_budget,
+        contact.max_budget,
     );
     
     let location_score = calculate_location_score(property, contact);
@@ -150,7 +213,105 @@ pub fn calculate_dynamic_score(
         property_type_score,
         size_score,
         Some(weight_adjuster),
-        property.location.as_deref(),
-        property.property_type.as_deref(),
+        Some(&format!("{:.1}_{:.1}", property.location.lat, property.location.lon)),
+        Some(property.property_type.as_str()),
     )
+}
+
+/// Enhanced scoring function with neural binning - Phase 1
+pub fn calculate_neural_enhanced_score(
+    property: &Property,
+    contact: &Contact,
+    neural_binner: &NeuralBinner,
+    location_embeddings: &HashMap<String, Vec<f32>>,
+    location_pooler: &LocationAttentionPooler,
+    weight_adjuster: Option<&WeightAdjuster>,
+) -> f64 {
+    // Extract features for neural binning
+    let mut property_features = HashMap::new();
+    property_features.insert("price".to_string(), property.price);
+    property_features.insert("area".to_string(), property.area_sqm as f64);
+    property_features.insert("rooms".to_string(), property.number_of_rooms as f64);
+
+    let mut contact_features = HashMap::new();
+    let budget_avg = (contact.min_budget + contact.max_budget) / 2.0;
+    contact_features.insert("budget".to_string(), budget_avg);
+    contact_features.insert("area".to_string(), (contact.min_area_sqm + contact.max_area_sqm) as f64 / 2.0);
+    contact_features.insert("rooms".to_string(), contact.min_rooms as f64);
+
+    // Get neural embeddings
+    let property_embedding = neural_binner.get_feature_vector(&property_features);
+    let contact_embedding = neural_binner.get_feature_vector(&contact_features);
+
+    // Calculate embedding similarity
+    let embedding_similarity = cosine_similarity(&property_embedding, &contact_embedding);
+
+    // Traditional scoring components
+    let budget_score = calculate_budget_score(
+        property.price,
+        contact.min_budget,
+        contact.max_budget,
+    );
+
+    // Enhanced location scoring with attention
+    let location_score = calculate_enhanced_location_score(
+        property, 
+        contact, 
+        location_embeddings, 
+        location_pooler
+    );
+
+    let property_type_score = calculate_property_type_score(property, contact);
+    let size_score = calculate_size_score(property, contact);
+
+    // Get dynamic weights
+    let weights = if let (Some(adjuster), Some(property_type)) = 
+        (weight_adjuster, Some(property.property_type.as_str())) {
+        // Create a simple location string representation
+        let location_str = format!("{:.1}_{:.1}", property.location.lat, property.location.lon);
+        adjuster.get_adjusted_weights(&location_str, property_type)
+    } else {
+        Weights::default()
+    };
+
+    // Enhanced scoring with neural components
+    let traditional_score = budget_score * weights.budget
+        + location_score * weights.location
+        + property_type_score * weights.property_type
+        + size_score * weights.size;
+
+    // Combine traditional and neural scoring
+    let neural_weight = 0.3; // 30% weight for neural features
+    let combined_score = (1.0 - neural_weight) * traditional_score 
+        + neural_weight * embedding_similarity.max(0.0).min(1.0);
+
+    combined_score.max(0.0).min(1.0)
+}
+
+/// Calculate feature compatibility score using neural binning
+pub fn calculate_feature_compatibility(
+    property: &Property,
+    contact: &Contact,
+    neural_binner: &NeuralBinner,
+) -> f64 {
+    // Individual feature compatibility scores
+    let price_bin_property = neural_binner.get_bin_index("price", property.price);
+    let budget_avg = (contact.min_budget + contact.max_budget) / 2.0;
+    let price_bin_contact = neural_binner.get_bin_index("budget", budget_avg);
+    
+    let area_bin_property = neural_binner.get_bin_index("area", property.area_sqm as f64);
+    let area_avg_contact = (contact.min_area_sqm + contact.max_area_sqm) as f64 / 2.0;
+    let area_bin_contact = neural_binner.get_bin_index("area", area_avg_contact);
+    
+    let room_bin_property = neural_binner.get_bin_index("rooms", property.number_of_rooms as f64);
+    let room_bin_contact = neural_binner.get_bin_index("rooms", contact.min_rooms as f64);
+
+    // Calculate bin distance penalties (closer bins = higher compatibility)
+    let price_compatibility = 1.0 - (price_bin_property as i32 - price_bin_contact as i32).abs() as f64 / 7.0;
+    let area_compatibility = 1.0 - (area_bin_property as i32 - area_bin_contact as i32).abs() as f64 / 7.0;
+    let room_compatibility = 1.0 - (room_bin_property as i32 - room_bin_contact as i32).abs() as f64 / 6.0;
+
+    // Weighted average
+    (price_compatibility * 0.4 + area_compatibility * 0.3 + room_compatibility * 0.3)
+        .max(0.0).min(1.0)
 }

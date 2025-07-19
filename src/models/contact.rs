@@ -46,3 +46,10 @@ pub struct UpdateContactRequest {
     pub name: Option<String>,
     pub preferences: Option<ContactPreferences>,
 }
+
+impl Contact {
+    pub fn get_all(_connection: &mut crate::utils::database::Connection) -> anyhow::Result<Vec<Contact>> {
+        // For now, return empty vector - in real implementation, query from database
+        Ok(Vec::new())
+    }
+}

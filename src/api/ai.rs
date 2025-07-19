@@ -5,6 +5,10 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct AIRecommendationQuery {
+    pub user_id: String,
+    pub limit: Option<usize>,
+    pub algorithm: Option<String>,
+    pub personalization_level: Option<f64>,
     pub enable_ml_scoring: Option<bool>,
     pub enable_market_analysis: Option<bool>,
     pub enable_predictive_matching: Option<bool>,
@@ -12,13 +16,13 @@ pub struct AIRecommendationQuery {
     pub min_confidence: Option<f64>,
 }
 
-/// Get AI-enhanced recommendations for a contact
+/// Get AI-enhanced recommendations for a user
 pub async fn get_ai_recommendations(
-    path: web::Path<i32>,
     query: web::Query<AIRecommendationQuery>,
     service: web::Data<AIRecommendationService>,
 ) -> Result<HttpResponse> {
-    let contact_id = path.into_inner();
+    // For now, we'll use user_id as contact_id (convert string to int)
+    let contact_id: i32 = query.user_id.parse().unwrap_or(1);
     
     let request = AIRecommendationRequest {
         contact_id,
@@ -121,10 +125,10 @@ pub async fn get_market_analysis(
 pub fn configure_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/ai")
-            .route("/recommendations/contact/{contact_id}", web::get().to(get_ai_recommendations))
-            .route("/models/initialize", web::post().to(initialize_ai_models))
-            .route("/models/stats", web::get().to(get_ai_model_stats))
+            .route("/recommendations", web::get().to(get_ai_recommendations))
+            .route("/initialize", web::post().to(initialize_ai_models))
+            .route("/stats", web::get().to(get_ai_model_stats))
             .route("/feedback", web::post().to(update_ai_with_feedback))
-            .route("/market/analysis", web::get().to(get_market_analysis))
+            .route("/market-analysis", web::get().to(get_market_analysis))
     );
 }

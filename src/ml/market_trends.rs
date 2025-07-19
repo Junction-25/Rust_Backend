@@ -469,6 +469,6 @@ mod tests {
         };
 
         let prediction = engine.predict_property_price(&property);
-        assert!(prediction.predicted_12m >= property.price);
+        assert!(prediction.predicted_price_12m >= property.price);
     }
 }

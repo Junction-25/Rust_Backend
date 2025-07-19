@@ -9,13 +9,14 @@ pub async fn get_property_recommendations(
 ) -> Result<HttpResponse> {
     let property_id = path.into_inner();
     
-    match service.get_recommendations_for_property(
+    match service.get_recommendations_for_property_with_neural(
         property_id, 
         query.limit, 
         query.min_score,
         query.top_k,
         query.top_percentile,
-        query.score_threshold_percentile
+        query.score_threshold_percentile,
+        query.neural_scoring,
     ).await {
         Ok(recommendations) => Ok(HttpResponse::Ok().json(recommendations)),
         Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
@@ -32,13 +33,14 @@ pub async fn get_contact_recommendations(
 ) -> Result<HttpResponse> {
     let contact_id = path.into_inner();
     
-    match service.get_recommendations_for_contact(
+    match service.get_recommendations_for_contact_with_neural(
         contact_id, 
         query.limit, 
         query.min_score,
         query.top_k,
         query.top_percentile,
-        query.score_threshold_percentile
+        query.score_threshold_percentile,
+        query.neural_scoring,
     ).await {
         Ok(recommendations) => Ok(HttpResponse::Ok().json(recommendations)),
         Err(e) => Ok(HttpResponse::InternalServerError().json(ErrorResponse {
@@ -68,6 +70,7 @@ pub struct RecommendationQuery {
     pub top_k: Option<usize>,
     pub top_percentile: Option<f64>, // Top X% of scores (e.g., 0.1 for top 10%)
     pub score_threshold_percentile: Option<f64>, // Only return scores above Xth percentile
+    pub neural_scoring: Option<bool>, // Phase 1: Toggle for neural scoring
 }
 
 #[derive(serde::Serialize)]

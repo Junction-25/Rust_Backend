@@ -63,6 +63,94 @@ async fn main() -> std::io::Result<()> {
         Arc::new(recommendation_service.clone()),
     );
 
+    // Initialize Phase 2 Advanced Recommendation Service
+    let advanced_config = services::advanced_recommendation::AdvancedServiceConfig::default();
+    let advanced_service = Arc::new(services::advanced_recommendation::AdvancedRecommendationService::new(
+        recommendation_service.clone(),
+        advanced_config,
+    ).expect("Failed to initialize advanced recommendation service"));
+    
+    // Initialize the advanced service with sample data for testing
+    tokio::spawn({
+        let advanced_service = advanced_service.clone();
+        async move {
+            log::info!("Initializing advanced recommendation service with sample data...");
+            
+            // Create sample properties for testing
+            let sample_properties = vec![
+                models::Property {
+                    id: 1,
+                    address: "123 Main St, Downtown, New York".to_string(),
+                    location: models::property::Location {
+                        lat: 40.7589,
+                        lon: -73.9851,
+                    },
+                    price: 450000.0,
+                    area_sqm: 85,
+                    property_type: "apartment".to_string(),
+                    number_of_rooms: 2,
+                },
+                models::Property {
+                    id: 2,
+                    address: "456 Oak Ave, Suburbs, Brooklyn".to_string(),
+                    location: models::property::Location {
+                        lat: 40.6892,
+                        lon: -73.9442,
+                    },
+                    price: 680000.0,
+                    area_sqm: 120,
+                    property_type: "house".to_string(),
+                    number_of_rooms: 3,
+                }
+            ];
+            
+            // Create sample contacts
+            let sample_contacts = vec![
+                models::Contact {
+                    id: 1,
+                    name: "John Doe".to_string(),
+                    preferred_locations: vec![
+                        models::property::NamedLocation {
+                            name: "New York".to_string(),
+                            lat: 40.7589,
+                            lon: -73.9851,
+                        }
+                    ],
+                    min_budget: 300000.0,
+                    max_budget: 500000.0,
+                    min_area_sqm: 60,
+                    max_area_sqm: 120,
+                    property_types: vec!["apartment".to_string()],
+                    min_rooms: 2,
+                },
+                models::Contact {
+                    id: 2,
+                    name: "Jane Smith".to_string(),
+                    preferred_locations: vec![
+                        models::property::NamedLocation {
+                            name: "Brooklyn".to_string(),
+                            lat: 40.6892,
+                            lon: -73.9442,
+                        }
+                    ],
+                    min_budget: 500000.0,
+                    max_budget: 700000.0,
+                    min_area_sqm: 100,
+                    max_area_sqm: 150,
+                    property_types: vec!["house".to_string()],
+                    min_rooms: 3,
+                }
+            ];
+            
+            // Initialize with sample data
+            if let Err(e) = advanced_service.initialize(&sample_properties, &sample_contacts).await {
+                log::error!("Failed to initialize advanced service: {}", e);
+            } else {
+                log::info!("Advanced recommendation service initialized successfully with sample data");
+            }
+        }
+    });
+
     // Initialize WebSocket manager
     let ws_manager = services::realtime::WebSocketManager::default().start();
     
@@ -91,11 +179,13 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(comparison_service.clone()))
             .app_data(web::Data::new(quote_service.clone()))
             .app_data(web::Data::new(ai_service.clone()))
+            .app_data(web::Data::new(advanced_service.clone()))
             .app_data(web::Data::new(ws_manager.clone()))
             .app_data(web::Data::new(notification_service.clone()))
             .wrap(cors)
             .wrap(Logger::default())
             .configure(api::configure_routes)
+            .configure(api::advanced_recommendations::configure_advanced_routes)
             .configure(services::realtime::configure_websocket_routes)
             .route("/health", web::get().to(health_check))
     })
